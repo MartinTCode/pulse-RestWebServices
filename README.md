@@ -2,4 +2,4 @@
 
 Use postgresql for database
 
-JavaFX for frontend. 
+JavaFX for frontend (+css)
