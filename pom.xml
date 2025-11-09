@@ -1,0 +1,436 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.pulse</groupId>
+    <artifactId>pulse-edudata-integrator</artifactId>
+    <name>Pulse EduDataIntegrator</name>
+    <url>https://github.com/MartinTCode/pulse-edudata-integrator</url>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <!-- Dependency versions -->
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>23.0.1</javafx.version>
+        <jUnit.version>5.11.3</jUnit.version>
+        <testfx.version>4.0.18</testfx.version>
+        <postgresql.version>42.7.5</postgresql.version>
+        <jakarta.jpa.version>3.1.0</jakarta.jpa.version>
+        <hibernate.version>6.6.13.Final</hibernate.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <logback.version>1.5.18</logback.version>
+        <bcrypt.version>0.10.2</bcrypt.version>
+        <!-- pin minimum Maven version via Enforcer -->
+        <maven.min.version>3.9.6</maven.min.version>
+        <!-- Dependency versions for depencies 2-->
+            <!-- REST Framework: Handles HTTP requests and JSON responses -->
+        <jersey.version>3.1.10</jersey.version>
+            <!-- Validation: Ensures data integrity before DB writes -->
+        <jakarta.validation.version>3.0.2</jakarta.validation.version>
+        <hibernate.validator.version>8.0.1.Final</hibernate.validator.version>
+            <!-- Database: Handles persistence and rollback-->
+        <jakarta.el.version>4.0.2</jakarta.el.version>
+         <!-- local pooling + migrations -->
+        <hikari.version>5.1.0</hikari.version>
+        <flyway.version>10.19.0</flyway.version>
+            <!-- Testing: Validates REST endpoints automatically -->
+        <restassured.version>5.5.0</restassured.version>
+
+        <!-- Plugin versions -->
+        <mJarP.version>3.4.2</mJarP.version>
+        <mDepP.version>3.6.1</mDepP.version>
+        <mCompilerP.version>3.13.0</mCompilerP.version>
+        <mSurefireP.version>3.5.3</mSurefireP.version>
+        <mJavafxP.version>0.0.8</mJavafxP.version>
+        <mFailsafeP.version>3.5.1</mFailsafeP.version>
+        <mEnforcerP.version>3.5.0</mEnforcerP.version>
+        <!-- Flyway Maven Plugin version -->
+        <mFlywayP.version>${flyway.version}</mFlywayP.version>
+
+        <!-- Database config for local development-->
+        <PG_URL>jdbc:postgresql://localhost:5432/pulse</PG_URL>
+        <PG_USER>pulse</PG_USER>
+        <PG_PASS>pulse</PG_PASS>
+
+    </properties>
+
+    <!--Keep Jersey modules in sync -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Jackson BOM -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.18.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <dependencies>
+        <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+
+        <!-- PostgreSQL Driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+
+         <!-- HikariCP connection pool for 3-schema local setup -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
+        </dependency>
+
+        <!-- Testing with JUnit Jupiter (most widely used Java testing framework)-->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${jUnit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- TestFX Core -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>${testfx.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- TestFX JUnit5 -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>${testfx.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JPA API -->
+        <!-- JPA (maven:JavaPersistanceAPI) moved to Jakarta Persistence API-->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta.jpa.version}</version>
+        </dependency>
+
+        <!-- Hibernate (JPA Implementation) -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <!-- Hibernate integration for HikariCP so Hibernate actually uses Hikari -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-hikaricp</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <!-- SLF4J API (Logging facade)-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- Logback (SLF4J Implementation) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- OPTIONAL. Remove if not used for HASHING (passwords etc)...-->
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+            <version>${bcrypt.version}</version>
+        </dependency>
+
+        <!-- "Depencies 2"-->
+
+        <!-- JAX-RS (Jersey): Provides the REST framework to define and expose HTTP endpoints
+             required for the Epok, StudentITS, and Ladok services. -->
+        <!-- JAX-RS (Jersey) -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+        </dependency>
+
+        <!-- Jersey Grizzly2 HTTP container: Runs the REST services in an embedded lightweight server -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+        </dependency>
+
+        <!-- Jersey JSON-Jackson module: Handles automatic conversion between Java objects
+             and JSON when sending/receiving data through REST endpoints. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+
+        <!-- Jersey Bean Validation extension:
+             Integrates Jakarta Validation (e.g. @Valid, @NotNull) with JAX-RS endpoints,
+             allowing automatic request validation and standardized HTTP 400 responses
+             when input data violates validation constraints. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.ext</groupId>
+            <artifactId>jersey-bean-validation</artifactId>
+        </dependency>
+        <!-- Jersey HK2 Dependency Injection:
+             Provides lightweight dependency injection support for Jersey resources,
+             enabling @Inject and @Singleton annotations within REST service classes. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+        </dependency>
+
+        <!-- Jackson JavaTime (dates in JSON just work) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.1</version>
+        </dependency>
+
+
+
+        <!-- Jakarta Validation API: Defines annotations like @NotNull, @Size, @Email
+             used to validate incoming REST data fields (e.g., personnummer, kurskod, betyg). -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta.validation.version}</version>
+        </dependency>
+
+        <!-- Hibernate Validator: Reference implementation of Jakarta Validation API,
+             performs the actual runtime validation of annotated fields. -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate.validator.version}</version>
+        </dependency>
+
+        <!-- Jakarta Expression Language (EL) implementation:
+             Required by Hibernate Validator to evaluate expression-based validation logic
+             such as dynamic messages or advanced constraint conditions at runtime. -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>${jakarta.el.version}</version>
+        </dependency>
+
+        <!-- REST Assured: Simplifies integration testing of REST endpoints by allowing
+             HTTP requests and JSON assertions directly from JUnit tests. -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${restassured.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Flyway core for running migrations programmatically if needed -->
+        <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>${flyway.version}</version>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Surefire Plugin to execute tests sequentially -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${mSurefireP.version}</version>
+                <configuration>
+                    <!-- Set tests not to run in parallel. -->
+                    <parallel>none</parallel>
+                    <!-- exclude integration-test naming so Surefire only runs unit tests -->
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                        <exclude>**/*ITCase.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${mCompilerP.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+
+            <!-- JavaFX Plugin -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>${mJavafxP.version}</version>
+                <configuration>
+                    <mainClass>com.pulse.frontend.Launcher</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Enforce Java 21+ to prevent wrong JDK builds -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${mEnforcerP.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[21,22)</version>
+                                </requireJavaVersion>
+                                <!-- Also require a modern-enough Maven -->
+                               <requireMavenVersion>
+                                    <version>[${maven.min.version},)</version>
+                                </requireMavenVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!-- Write a plain manifest with the entry point (no bundling of deps) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${mJarP.version}</version>
+                <configuration>
+                <archive>
+                    <manifest>
+                    <addClasspath>true</addClasspath>
+                    <mainClass>com.pulse.frontend.Launcher</mainClass>
+                    <!-- Class-Path entries are only hints; we’ll still pass -cp at run -->
+                    </manifest>
+                </archive>
+                </configuration>
+            </plugin>
+
+            <!--Copy runtime deps to target/dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${mDepP.version}</version>
+                <executions>
+                <execution>
+                    <id>copy-runtime-deps</id>
+                    <phase>package</phase>
+                    <goals><goal>copy-dependencies</goal></goals>
+                    <configuration>
+                    <includeScope>runtime</includeScope>
+                    <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                    </configuration>
+                </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <!-- Dedicated profile to run integration tests with Failsafe on demand -->
+    <profiles>
+        <profile>
+            <id>it</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${mFailsafeP.version}</version>
+                        <configuration>
+                            <!-- Pick up only IT-style tests when you run with -Pit -->
+                            <includes>
+                                <include>**/*IT.java</include>
+                                <include>**/*ITCase.java</include>
+                            </includes>
+                            <parallel>methods</parallel>
+                            <threadCount>1</threadCount>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>db</id>
+            <build>
+            <plugins>
+                <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.version}</version>
+                <configuration>
+                    <url>${PG_URL}</url>
+                    <user>${PG_USER}</user>
+                    <password>${PG_PASS}</password>
+                    <schemas>
+                    <schema>epok</schema>
+                    <schema>studentits</schema>
+                    <schema>ladok</schema>
+                    </schemas>
+                    <locations>
+                    <location>filesystem:src/main/resources/db/migration/epok</location>
+                    <location>filesystem:src/main/resources/db/migration/studentits</location>
+                    <location>filesystem:src/main/resources/db/migration/ladok</location>
+                    </locations>
+                </configuration>
+                </plugin>
+            </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
