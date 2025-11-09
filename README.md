@@ -6,7 +6,7 @@ JavaFX for frontend (+css)
 
 Junit5 for testing.
 
-# Branching strategy:
+## Branching strategy:
 
 - frontend
 - database 1 for each service.
