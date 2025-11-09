@@ -85,10 +85,10 @@ Each dependency below supports a specific architectural layer or development act
 
 ---
 
-## Why These Dependencies Are Used in Assignment 3
+## Why These Dependencies Are Used
 
-Assignment 3 focuses on implementing a prototype of the *“Administration of Study Results”* process using REST-based web services that simulate LTU’s systems **Epok**, **StudentITS**, and **Ladok**.  
-These dependencies together provide all layers required for that architecture:
+This project implements a prototype that simulates a digital workflow for managing study results across multiple integrated systems.  
+The dependencies together provide all layers required for this architecture:
 
 - **Jersey + Jackson** enable building and exposing REST endpoints that exchange JSON between the simulated systems.  
 - **Hibernate + JPA + PostgreSQL + HikariCP** handle persistence for each system’s local database schema.  
@@ -97,7 +97,7 @@ These dependencies together provide all layers required for that architecture:
 - **JavaFX** provides a lightweight GUI for interacting with the backend prototype.  
 - **Logging and Testing (SLF4J, Logback, JUnit, Rest-Assured)** support debugging and verifying correct REST communication.
 
-In short, these dependencies implement a realistic **Service-Oriented Architecture (SOA)** stack that covers the complete flow described in the assignment—from GUI input to REST integration and database persistence.
+In short, these dependencies implement a realistic **Service-Oriented Architecture (SOA)** stack that covers the complete flow—from GUI input to REST integration and database persistence.
 
 ---
 
