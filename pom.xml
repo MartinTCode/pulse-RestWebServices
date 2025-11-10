@@ -325,7 +325,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[21,24)</version>
+                                    <version>[${java.version},)</version>
                                 </requireJavaVersion>
                                 <!-- Also require a modern-enough Maven -->
                                <requireMavenVersion>
