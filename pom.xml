@@ -268,6 +268,14 @@
 
     <build>
         <plugins>
+
+            <!-- Allows running a main class via Maven (e.g., starting the REST server). -->
+             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.2</version>
+            </plugin>
+            
             <!-- Maven Surefire Plugin to execute tests sequentially -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
