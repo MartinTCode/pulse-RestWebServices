@@ -263,17 +263,37 @@
         <version>${flyway.version}</version>
         </dependency>
 
+        <!-- Flyway Maven Plugin: Allows running database migrations using Maven -->
+        <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-database-postgresql</artifactId>
+        <version>${flyway.version}</version>
+        </dependency>
+
 
     </dependencies>
 
     <build>
         <plugins>
 
-            <!-- Allows running a main class via Maven (e.g., starting the REST server). -->
+            <!-- Exec Maven Plugin:
+            Allows running a Java main class directly via Maven (e.g. starting the REST server with `mvn exec:java`).
+            Uses the runtime classpath so dependencies like Jersey, HikariCP and the PostgreSQL driver are included -->
              <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.6.2</version>
+                    <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.pulse.server.RestServer</mainClass>
+                    <classpathScope>runtime</classpathScope>
+                </configuration>
             </plugin>
             
             <!-- Maven Surefire Plugin to execute tests sequentially -->
