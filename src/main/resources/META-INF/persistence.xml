@@ -7,6 +7,7 @@
     <!--Three percistence units to simulate separate systems-->
     <!--Ladok persistence unit-->
     <persistence-unit name="ladokPU">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.pulse.ladok.entity.Result</class>
         
         <properties>
@@ -30,6 +31,7 @@
 
     <!-- Epok persistence unit -->
     <persistence-unit name="epokPU">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.pulse.epok.entity.Course</class>
         <class>com.pulse.epok.entity.Module</class>
 
@@ -52,9 +54,10 @@
 
     <!-- StudentITS persistence unit -->
     <persistence-unit name="studentitsPU">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.pulse.studentits.entity.StudentAccount</class>
 
-                <properties>
+        <properties>
 
         <!-- Schema and Hibernate for StudentITS-->
         <property name="hibernate.default_schema" value="studentits"/>
