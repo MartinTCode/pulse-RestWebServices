@@ -25,7 +25,10 @@ public class RestServer {
     }
 
     public static HttpServer startServer() {
-        final ResourceConfig rc = new ResourceConfig().packages("com.pulse.epok.api");
+        final ResourceConfig rc = new ResourceConfig().packages(
+            "com.pulse.epok.api",
+            "com.pulse.studentits.api",
+            "com.pulse.ladok.api");
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
