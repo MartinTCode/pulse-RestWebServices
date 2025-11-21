@@ -62,6 +62,14 @@ public class Result {
         this.courseId = courseId;
     }
 
+    public String getModuleCode() {
+        return moduleCode;
+    }
+
+    public void setModuleCode(String moduleCode) {
+        this.moduleCode = moduleCode;
+    }
+
     public String getGrade() {
         return grade;
     }
