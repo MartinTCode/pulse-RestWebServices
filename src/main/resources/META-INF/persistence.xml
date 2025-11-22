@@ -21,7 +21,7 @@
 
         <!--JDBC connection properties for Ladok-->
         <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/pulse"/>
-        <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+        <property name="jakarta.persistence.jdbc.user" value="pulse"/>
         <property name="jakarta.persistence.jdbc.password" value="pulse"/>
         <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
@@ -46,7 +46,7 @@
 
         <!-- JDBC connection properties for Epok-->
         <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/pulse"/>
-        <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+        <property name="jakarta.persistence.jdbc.user" value="pulse"/>
         <property name="jakarta.persistence.jdbc.password" value="pulse"/>
         <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
     </properties>
@@ -68,7 +68,7 @@
         
         <!-- JDBC connection properties for StudentITS-->
         <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/pulse"/>
-        <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+        <property name="jakarta.persistence.jdbc.user" value="pulse"/>
         <property name="jakarta.persistence.jdbc.password" value="pulse"/>
         <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
     </properties>
