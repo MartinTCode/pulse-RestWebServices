@@ -1,9 +1,10 @@
-package com.pulse.studentits.dao;
+package com.pulse.dao;
 
-import com.pulse.studentits.entity.StudentAccount;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
+
+import com.pulse.entity.StudentAccountEntity;
 
 public class StudentAccountDAO {
     private final EntityManager em;
@@ -13,15 +14,15 @@ public class StudentAccountDAO {
     }
 
     // find by student id
-    public StudentAccount findByStudentId(String studentId) {
-        return em.find(StudentAccount.class, studentId);
+    public StudentAccountEntity findByStudentId(String studentId) {
+        return em.find(StudentAccountEntity.class, studentId);
     }
 
     // Find by personal number
-    public List<StudentAccount> findAccountsByPersonalNo(String personalNo) {
-        TypedQuery<StudentAccount> query = em.createQuery(
+    public List<StudentAccountEntity> findAccountsByPersonalNo(String personalNo) {
+        TypedQuery<StudentAccountEntity> query = em.createQuery(
                 "SELECT sa FROM StudentAccount sa WHERE sa.personalNo = :personalNo",
-                StudentAccount.class);
+                StudentAccountEntity.class);
         query.setParameter("personalNo", personalNo);
         return query.getResultList();
     }

@@ -1,7 +1,7 @@
-package com.pulse.studentits.service;
+package com.pulse.service;
 
-import com.pulse.studentits.dao.StudentAccountDAO;
-import com.pulse.studentits.entity.StudentAccount;
+import com.pulse.dao.StudentAccountDAO;
+import com.pulse.entity.StudentAccountEntity;
 
 public class StudentService {
 
@@ -11,7 +11,7 @@ public class StudentService {
         this.studentAccountDAO = studentAccountDAO;
     }
 
-    public StudentAccount getStudentById(String studentId) {
+    public StudentAccountEntity getStudentById(String studentId) {
         if (studentId == null || studentId.isBlank()) {
             throw new IllegalArgumentException("Student ID cannot be empty.");
         }
@@ -19,7 +19,7 @@ public class StudentService {
     }
 
     public String getPersonalNumber(String studentId) {
-        StudentAccount account = getStudentById(studentId);
+        StudentAccountEntity account = getStudentById(studentId);
         if (account == null) {
             throw new IllegalArgumentException("Student not found");
         }

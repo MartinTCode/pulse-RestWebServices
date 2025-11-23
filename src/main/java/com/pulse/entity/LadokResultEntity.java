@@ -1,11 +1,11 @@
-package com.pulse.ladok.entity;
+package com.pulse.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "result", schema = "ladok")
-public class Result {
+public class LadokResultEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "result_id", nullable = false)
@@ -27,9 +27,9 @@ public class Result {
     private String grade;
 
     // Constructors
-    public Result() {
+    public LadokResultEntity() {
     }
-    public Result(String personalNo, String courseId, String moduleCode, LocalDate examDate, String grade) {
+    public LadokResultEntity(String personalNo, String courseId, String moduleCode, LocalDate examDate, String grade) {
         this.personalNo = personalNo;
         this.courseId = courseId;
         this.moduleCode = moduleCode;

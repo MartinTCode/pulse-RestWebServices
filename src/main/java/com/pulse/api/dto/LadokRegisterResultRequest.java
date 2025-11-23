@@ -1,15 +1,15 @@
-package com.pulse.ladok.api.dto;
+package com.pulse.api.dto;
 
 import java.time.LocalDate;
 
-public class RegisterResultRequest {
+public class LadokRegisterResultRequest {
     private String personalNo;
     private String courseId;
     private String moduleCode;
     private LocalDate examDate;
     private String grade;
 
-    public RegisterResultRequest() {}
+    public LadokRegisterResultRequest() {}
 
     public String getPersonalNo() { return personalNo; }
     public void setPersonalNo(String personalNo) { this.personalNo = personalNo; }

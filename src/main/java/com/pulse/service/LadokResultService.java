@@ -1,19 +1,19 @@
-package com.pulse.ladok.service;
+package com.pulse.service;
 
-import com.pulse.ladok.dao.ResultDAO;
-import com.pulse.ladok.entity.Result;
+import com.pulse.dao.LadokResultDAO;
+import com.pulse.entity.LadokResultEntity;
 
 import java.time.LocalDate;
 
-public class ResultService {
+public class LadokResultService {
 
-    private final ResultDAO resultDAO;
+    private final LadokResultDAO resultDAO;
 
-    public ResultService(ResultDAO resultDAO) {
+    public LadokResultService(LadokResultDAO resultDAO) {
         this.resultDAO = resultDAO;
     }
 
-    public Result registerResult(String personalNo, String courseId, String moduleCode, LocalDate examDate, String grade) {
+    public LadokResultEntity registerResult(String personalNo, String courseId, String moduleCode, LocalDate examDate, String grade) {
         if (personalNo == null || personalNo.isBlank())
             throw new IllegalArgumentException("personalNo is required");
 
@@ -29,7 +29,7 @@ public class ResultService {
         if (grade == null || grade.isBlank())
             throw new IllegalArgumentException("grade is required");
 
-        Result result = new Result(personalNo, courseId, moduleCode, examDate, grade);
+        LadokResultEntity result = new LadokResultEntity(personalNo, courseId, moduleCode, examDate, grade);
         resultDAO.saveResult(result);
 
         return result;

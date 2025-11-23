@@ -1,9 +1,10 @@
-package com.pulse.studentits.api;
+package com.pulse.api;
 
 import com.pulse.config.EntityManagerFactoryProvider;
-import com.pulse.studentits.dao.StudentAccountDAO;
-import com.pulse.studentits.entity.StudentAccount;
-import com.pulse.studentits.service.StudentService;
+import com.pulse.dao.StudentAccountDAO;
+import com.pulse.entity.StudentAccountEntity;
+import com.pulse.service.StudentService;
+
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -55,7 +56,7 @@ public class StudentController {
     @Path("/students/{studentId}")
     public Response getStudent(@PathParam("studentId") String studentId) {
         try {
-            StudentAccount account = studentService.getStudentById(studentId);
+            StudentAccountEntity account = studentService.getStudentById(studentId);
             if (account == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity(Map.of("error", "Student not found"))
