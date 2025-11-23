@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "student_account", schema = "studentits")
-public class StudentAccountEntity {
+public class StudentitsStudentAccountEntity {
     @Id
     @Column(name = "student_id", nullable = false, length = 50)
     private String studentId;
@@ -13,10 +13,10 @@ public class StudentAccountEntity {
     private String personalNo;
 
     //Constructors
-    public StudentAccountEntity() {
+    public StudentitsStudentAccountEntity() {
     }
 
-    public StudentAccountEntity(String studentId, String personalNo) {
+    public StudentitsStudentAccountEntity(String studentId, String personalNo) {
         this.studentId = studentId;
         this.personalNo = personalNo;
     }

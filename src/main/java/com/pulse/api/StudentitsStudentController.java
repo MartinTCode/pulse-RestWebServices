@@ -1,9 +1,9 @@
 package com.pulse.api;
 
 import com.pulse.config.EntityManagerFactoryProvider;
-import com.pulse.dao.StudentAccountDAO;
-import com.pulse.entity.StudentAccountEntity;
-import com.pulse.service.StudentService;
+import com.pulse.dao.StudentitsStudentAccountDAO;
+import com.pulse.entity.StudentitsStudentAccountEntity;
+import com.pulse.service.StudentitsStudentService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.*;
@@ -15,17 +15,17 @@ import java.util.Map;
 
 @Path("/student-its")
 @Produces(MediaType.APPLICATION_JSON)
-public class StudentController {
+public class StudentitsStudentController {
 
-    private final StudentService studentService;
+    private final StudentitsStudentService studentService;
 
-    public StudentController() {
+    public StudentitsStudentController() {
         EntityManager em = EntityManagerFactoryProvider
                 .getFactory("studentitsPU")
                 .createEntityManager();
 
-        StudentAccountDAO dao = new StudentAccountDAO(em);
-        this.studentService = new StudentService(dao);
+        StudentitsStudentAccountDAO dao = new StudentitsStudentAccountDAO(em);
+        this.studentService = new StudentitsStudentService(dao);
     }
 
     @GET
@@ -56,7 +56,7 @@ public class StudentController {
     @Path("/students/{studentId}")
     public Response getStudent(@PathParam("studentId") String studentId) {
         try {
-            StudentAccountEntity account = studentService.getStudentById(studentId);
+            StudentitsStudentAccountEntity account = studentService.getStudentById(studentId);
             if (account == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity(Map.of("error", "Student not found"))
