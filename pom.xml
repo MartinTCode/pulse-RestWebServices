@@ -456,6 +456,7 @@
                     <user>${PG_USER}</user>
                     <password>${PG_PASS}</password>
                     <cleanDisabled>false</cleanDisabled>
+                    <baselineOnMigrate>true</baselineOnMigrate>
                     <defaultSchema>flyway</defaultSchema>
                     <schemas>
                     <schema>flyway</schema>
