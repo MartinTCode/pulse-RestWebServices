@@ -37,6 +37,7 @@ public class DatabaseIntegrationTest {
     // Central list of schema/table pairs to test against.
     private static final List<Arguments> TABLES = List.of(
         arguments("epok", "course"),
+        arguments("epok", "module"),
         arguments("studentits", "student_account"),
         arguments("ladok", "result")
     );
