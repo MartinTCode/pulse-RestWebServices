@@ -1,13 +1,14 @@
 package com.pulse.server;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Properties;
+
 import org.flywaydb.core.Flyway;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-
-import com.pulse.config.DatabaseConfig;
-
-import java.net.URI;
 
 public class RestServer {
 
@@ -17,19 +18,17 @@ public class RestServer {
      * Run Flyway migrations before starting the HTTP server.
      */
     private static void migrateDatabase() {
-        Flyway flyway = Flyway.configure()
-                .dataSource(DatabaseConfig.getUrl(), DatabaseConfig.getUser(), DatabaseConfig.getPassword())
-                .load();
+        Properties props = loadFlywayConfig();
+        Flyway flyway = createFlyway(props);
         flyway.migrate();
         System.out.println("Flyway database migration completed.");
     }
 
+
+
     public static HttpServer startServer() {
         final ResourceConfig rc = new ResourceConfig().packages(
-            "com.pulse.api",
-            "com.pulse.epok.api",
-            "com.pulse.studentits.api",
-            "com.pulse.ladok.api");
+            "com.pulse");
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
@@ -49,4 +48,30 @@ public class RestServer {
             System.out.println("Main thread interrupted, shutting down.");
         }
     }
+
+    private static Properties loadFlywayConfig() {
+        try (InputStream in = RestServer.class
+                .getClassLoader()
+                .getResourceAsStream("flyway.conf")) {
+
+            if (in == null) {
+                throw new IllegalStateException("flyway.conf not found on classpath");
+            }
+
+            Properties props = new Properties();
+            props.load(in);
+            return props;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load flyway.conf", e);
+        }
+        }
+
+    private static Flyway createFlyway(Properties props) {
+    return Flyway.configure()
+            .configuration(props)
+            .load();
+}
+
+
 }

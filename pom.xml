@@ -452,23 +452,9 @@
                 </dependencies>
 
                 <configuration>
-                    <url>${PG_URL}</url>
-                    <user>${PG_USER}</user>
-                    <password>${PG_PASS}</password>
-                    <cleanDisabled>false</cleanDisabled>
-                    <baselineOnMigrate>true</baselineOnMigrate>
-                    <defaultSchema>flyway</defaultSchema>
-                    <schemas>
-                    <schema>flyway</schema>
-                    <schema>epok</schema>
-                    <schema>studentits</schema>
-                    <schema>ladok</schema>
-                    </schemas>
-                    <locations>
-                    <location>filesystem:src/main/resources/db/migration/epok</location>
-                    <location>filesystem:src/main/resources/db/migration/studentits</location>
-                    <location>filesystem:src/main/resources/db/migration/ladok</location>
-                    </locations>
+                    <configFiles>
+                        <configFile>src/main/resources/flyway.conf</configFile>
+                    </configFiles>
                 </configuration>
                 </plugin>
             </plugins>
