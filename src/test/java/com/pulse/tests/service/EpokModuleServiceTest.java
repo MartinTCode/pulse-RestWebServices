@@ -1,7 +1,6 @@
 package com.pulse.tests.service;
 
 import com.pulse.dao.EpokModuleDAO;
-import com.pulse.entity.EpokCourseEntity;
 import com.pulse.entity.EpokModuleEntity;
 import com.pulse.service.EpokModuleService;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.pulse.tests.util.service.ServiceTestData;
 
 public class EpokModuleServiceTest {
 
@@ -23,26 +23,16 @@ public class EpokModuleServiceTest {
 
 	@Test
 	void getModulesByCourseId_returnsModules_whenCourseIdIsValid() {
-		//test value constraints
-		final String courseId = "CS101";
-		final String courseName = "Intro to Testing";
-
-		final String moduleCode1 = "M1";
-		final String moduleName1 = "Module One";
-		final String moduleCode2 = "M2";
-		final String moduleName2 = "Module Two";
-
-		EpokCourseEntity course = new EpokCourseEntity(courseId, courseName);
-
-		EpokModuleEntity m1 = new EpokModuleEntity(moduleCode1, moduleName1, course);
-		EpokModuleEntity m2 = new EpokModuleEntity(moduleCode2, moduleName2, course);
+		// test value constraints (use TestData factories/constants)
+	EpokModuleEntity m1 = ServiceTestData.module1();
+	EpokModuleEntity m2 = ServiceTestData.module2();
 
 		EpokModuleDAO stubDao = new EpokModuleDAO(null) {
 			@Override
 			public List<EpokModuleEntity> findModulesByCourseId(String id) {
 				// simple stub behaviour: return two modules when the requested id
 				// equals the test course id, otherwise return an empty list
-				if (courseId.equals(id)) {
+				if (ServiceTestData.COURSE_ID.equals(id)) {
 					return Arrays.asList(m1, m2);
 				}
 				return List.of();
@@ -51,14 +41,14 @@ public class EpokModuleServiceTest {
 
 		EpokModuleService service = new EpokModuleService(stubDao);
 
-		// Use the local constant when calling the service
-		List<EpokModuleEntity> result = service.getModulesByCourseId(courseId);
+		// Use the shared TestData constant when calling the service
+	List<EpokModuleEntity> result = service.getModulesByCourseId(ServiceTestData.COURSE_ID);
 
 		assertNotNull(result);
 		assertEquals(2, result.size());
-		// Assert using the extracted constants to avoid duplicating literals
-		assertEquals(moduleCode1, result.get(0).getModuleCode());
-		assertEquals(moduleCode2, result.get(1).getModuleCode());
+		// Assert using the TestData constants to avoid duplicating literals
+	assertEquals(ServiceTestData.MODULE_CODE_1, result.get(0).getModuleCode());
+	assertEquals(ServiceTestData.MODULE_CODE_2, result.get(1).getModuleCode());
 	}
 
 
