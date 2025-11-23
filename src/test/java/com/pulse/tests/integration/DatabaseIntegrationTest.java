@@ -9,10 +9,17 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.Properties;
+import java.util.stream.Stream;
+import java.util.List;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * Integration tests that verify the configured database is reachable
@@ -26,6 +33,13 @@ public class DatabaseIntegrationTest {
 
     // holds the loaded DB connection properties
     private static Properties dbProps;
+
+    // Central list of schema/table pairs to test against.
+    private static final List<Arguments> TABLES = List.of(
+        arguments("epok", "course"),
+        arguments("studentits", "student_account"),
+        arguments("ladok", "result")
+    );
 
     @BeforeAll
     public static void loadProps() throws Exception {
@@ -60,55 +74,23 @@ public class DatabaseIntegrationTest {
             Assumptions.assumeTrue(false, "DB not reachable: " + e.getMessage());
         }
     }
-
-    @Test
-    public void testEpokCourseTableExists() throws Exception {
-        String url = dbProps.getProperty("db.url");
-        String user = dbProps.getProperty("db.user");
-        String pass = dbProps.getProperty("db.password");
-
-        // Connect and verify the `epok.course` table exists. A failure here
-        // indicates the database schema/migrations haven't been applied.
-        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-            Assumptions.assumeTrue(conn != null && !conn.isClosed(), "DB connection not available; skipping table existence test");
-
-            boolean exists = tableExists(conn, "epok", "course");
-            assertTrue(exists, "Expected table epok.course to exist");
+    // Parameterized test to cover multiple schema.table combinations without
+    // duplicating nearly identical code for each table. 
+    @ParameterizedTest(name = "Check table exists: {0}.{1}") // The {0}.{1} in the gets the arguments from the tableProvider
+    @MethodSource("tableProvider")
+    public void testTableExists(String schema, String tableName) throws Exception {
+        try (Connection conn = openConnectionOrSkip()) {
+            boolean exists = tableExists(conn, schema, tableName);
+            assertTrue(exists, String.format("Expected table %s.%s to exist", schema, tableName));
         }
     }
 
-    @Test
-    public void testStudentitsStudentAccountTableExists() throws Exception {
-        String url = dbProps.getProperty("db.url");
-        String user = dbProps.getProperty("db.user");
-        String pass = dbProps.getProperty("db.password");
 
-        // Verify the `studentits.student_account` table exists which is part of
-        // the StudentITS schema. This helps ensure that the student system's
-        // baseline migration was applied.
-        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-            Assumptions.assumeTrue(conn != null && !conn.isClosed(), "DB connection not available; skipping studentits table test");
-
-            boolean exists = tableExists(conn, "studentits", "student_account");
-            assertTrue(exists, "Expected table studentits.student_account to exist");
-        }
-    }
-
-    @Test
-    public void testLadokResultTableExists() throws Exception {
-        String url = dbProps.getProperty("db.url");
-        String user = dbProps.getProperty("db.user");
-        String pass = dbProps.getProperty("db.password");
-
-        // Verify the `ladok.result` table exists which stores results in the
-        // Ladok schema. A missing table here commonly means Flyway migrations
-        // were not executed for the Ladok schema.
-        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-            Assumptions.assumeTrue(conn != null && !conn.isClosed(), "DB connection not available; skipping ladok table test");
-
-            boolean exists = tableExists(conn, "ladok", "result");
-            assertTrue(exists, "Expected table ladok.result to exist");
-        }
+    // Provides schema/table pairs to the parameterized test above.
+    private static Stream<Arguments> tableProvider() {
+        // Return a fresh stream from the top-level list so the MethodSource can
+        // be reused safely by JUnit.
+        return TABLES.stream();
     }
 
     /** Helper to check whether a table exists in a given schema. */
@@ -121,6 +103,24 @@ public class DatabaseIntegrationTest {
         try (ResultSet rs = meta.getTables(null, schema, tableName, new String[]{"TABLE"})) {
             //rs.next to move to first metadata row, which will only exist if the table is found
             return rs.next();
+        }
+    }
+
+    /**
+     * Open a JDBC connection using the loaded properties. If the connection
+     * cannot be opened the test is skipped (via JUnit Assumptions).
+     */
+    private Connection openConnectionOrSkip() throws Exception {
+        String url = dbProps.getProperty("db.url");
+        String user = dbProps.getProperty("db.user");
+        String pass = dbProps.getProperty("db.password");
+        try {
+            Connection conn = DriverManager.getConnection(url, user, pass);
+            Assumptions.assumeTrue(conn != null && !conn.isClosed(), "Could not open DB connection; skipping tests");
+            return conn;
+        } catch (Exception e) {
+            Assumptions.assumeTrue(false, "DB not reachable: " + e.getMessage());
+            return null; // unreachable but keeps compiler happy
         }
     }
 }
