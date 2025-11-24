@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.stream.Stream;
-import java.util.List;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,7 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.params.provider.Arguments.arguments;
+// arguments() helper no longer needed here; IntegrationTestData provides the table list
+import com.pulse.tests.util.integration.IntegrationTestData;
 
 /**
  * Integration tests that verify the configured database is reachable
@@ -34,12 +34,9 @@ public class DatabaseIntegrationTest {
     // holds the loaded DB connection properties
     private static Properties dbProps;
 
-    // Central list of schema/table pairs to test against.
-    private static final List<Arguments> TABLES = List.of(
-        arguments("epok", "course"),
-        arguments("studentits", "student_account"),
-        arguments("ladok", "result")
-    );
+    // Central list of schema/table pairs is provided by IntegrationTestData
+    // (keeps integration expectations in a single place shared by tests).
+    // See com.pulse.tests.util.integration.IntegrationTestData
 
     @BeforeAll
     public static void loadProps() throws Exception {
@@ -90,7 +87,7 @@ public class DatabaseIntegrationTest {
     private static Stream<Arguments> tableProvider() {
         // Return a fresh stream from the top-level list so the MethodSource can
         // be reused safely by JUnit.
-        return TABLES.stream();
+        return IntegrationTestData.tableProvider();
     }
 
     /** Helper to check whether a table exists in a given schema. */

@@ -1,10 +1,10 @@
-package com.pulse.epok.entity;
+package com.pulse.entity;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "module", schema = "epok")
-public class Module {
+public class EpokModuleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "module_id", nullable = false)
@@ -19,13 +19,13 @@ public class Module {
     // FK: module.course_id -> course.course_id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
+    private EpokCourseEntity course;
 
     // Constructors
-    public Module() {
+    public EpokModuleEntity() {
     }
 
-    public Module(String moduleCode, String moduleName, Course course) {
+    public EpokModuleEntity(String moduleCode, String moduleName, EpokCourseEntity course) {
         this.moduleCode = moduleCode;
         this.moduleName = moduleName;
         this.course = course;
@@ -53,10 +53,10 @@ public class Module {
         this.moduleName = moduleName;
     }
 
-    public Course getCourse() {
+    public EpokCourseEntity getCourse() {
         return course;
     }
-    public void setCourse(Course course) {
+    public void setCourse(EpokCourseEntity course) {
         this.course = course;
     }
 }

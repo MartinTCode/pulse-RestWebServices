@@ -1,10 +1,10 @@
-package com.pulse.ladok.api;
+package com.pulse.api;
 
+import com.pulse.api.dto.LadokRegisterResultRequest;
 import com.pulse.config.EntityManagerFactoryProvider;
-import com.pulse.ladok.api.dto.RegisterResultRequest;
-import com.pulse.ladok.dao.ResultDAO;
-import com.pulse.ladok.entity.Result;
-import com.pulse.ladok.service.ResultService;
+import com.pulse.dao.LadokResultDAO;
+import com.pulse.entity.LadokResultEntity;
+import com.pulse.service.LadokResultService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.*;
@@ -16,25 +16,25 @@ import java.util.Map;
 @Path("/ladok")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ResultController {
+public class LadokResultController {
 
-    private final ResultService resultService;
+    private final LadokResultService resultService;
 
-    public ResultController() {
+    public LadokResultController() {
         EntityManager em = EntityManagerFactoryProvider
                 .getFactory("ladokPU")
                 .createEntityManager();
 
-        ResultDAO dao = new ResultDAO(em);
-        this.resultService = new ResultService(dao);
+        LadokResultDAO dao = new LadokResultDAO(em);
+        this.resultService = new LadokResultService(dao);
     }
 
     // Assignment spec: reg_Resultat
     @POST
     @Path("/results")
-    public Response registerResult(RegisterResultRequest req) {
+    public Response registerResult(LadokRegisterResultRequest req) {
         try {
-            Result saved = resultService.registerResult(
+            LadokResultEntity saved = resultService.registerResult(
                     req.getPersonalNo(),
                     req.getCourseId(),
                     req.getModuleCode(),

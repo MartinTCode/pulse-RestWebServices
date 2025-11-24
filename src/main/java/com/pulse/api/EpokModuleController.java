@@ -1,9 +1,10 @@
-package com.pulse.epok.api;
+package com.pulse.api;
 
-import com.pulse.epok.dao.ModuleDAO;
-import com.pulse.epok.entity.Module;
-import com.pulse.epok.service.ModuleService;
+import com.pulse.service.EpokModuleService;
 import com.pulse.config.EntityManagerFactoryProvider;
+import com.pulse.dao.EpokModuleDAO;
+import com.pulse.entity.EpokModuleEntity;
+
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -13,25 +14,24 @@ import java.util.List;
 
 @Path("/modules")
 @Produces(MediaType.APPLICATION_JSON)
-public class ModuleController {
+public class EpokModuleController {
 
-    private final ModuleService moduleService;
+    private final EpokModuleService moduleService;
 
-    public ModuleController() {
+    public EpokModuleController() {
 
         EntityManager em = EntityManagerFactoryProvider
                 .getFactory("epokPU")
                 .createEntityManager();
-
-        ModuleDAO moduleDAO = new ModuleDAO(em);
-        this.moduleService = new ModuleService(moduleDAO);
+        EpokModuleDAO moduleDAO = new EpokModuleDAO(em);
+        this.moduleService = new EpokModuleService(moduleDAO);
     }
 
     @GET
     @Path("/{courseId}")
     public Response getModulesByCourseId(@PathParam("courseId") String courseId) {
         try {
-            List<Module> modules = moduleService.getModulesByCourseId(courseId);
+            List<EpokModuleEntity> modules = moduleService.getModulesByCourseId(courseId);
             return Response.ok(modules).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)

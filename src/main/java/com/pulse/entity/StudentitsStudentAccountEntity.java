@@ -1,10 +1,10 @@
-package com.pulse.studentits.entity;
+package com.pulse.entity;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "student_account", schema = "studentits")
-public class StudentAccount {
+public class StudentitsStudentAccountEntity {
     @Id
     @Column(name = "student_id", nullable = false, length = 50)
     private String studentId;
@@ -13,10 +13,10 @@ public class StudentAccount {
     private String personalNo;
 
     //Constructors
-    public StudentAccount() {
+    public StudentitsStudentAccountEntity() {
     }
 
-    public StudentAccount(String studentId, String personalNo) {
+    public StudentitsStudentAccountEntity(String studentId, String personalNo) {
         this.studentId = studentId;
         this.personalNo = personalNo;
     }

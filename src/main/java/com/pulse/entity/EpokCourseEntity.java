@@ -1,11 +1,11 @@
-package com.pulse.epok.entity;
+package com.pulse.entity;
 
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "course", schema = "epok")
-public class Course {
+public class EpokCourseEntity {
 
     @Id
     @Column(name = "course_id", nullable = false, length = 50)      
@@ -16,13 +16,13 @@ public class Course {
 
     //One-to-Many relationship with Module
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    private List<Module> modules;
+    private List<EpokModuleEntity> modules;
 
     //Constructor
-    public Course() {
+    public EpokCourseEntity() {
     }
 
-    public Course(String courseId, String courseName) {
+    public EpokCourseEntity(String courseId, String courseName) {
         this.courseId = courseId;
         this.courseName = courseName;
     }
@@ -42,10 +42,10 @@ public class Course {
     }
 
     //Modules Getter and Setter
-    public List<Module> getModules() {
+    public List<EpokModuleEntity> getModules() {
         return modules;
     }
-    public void setModules(List<Module> modules) {
+    public void setModules(List<EpokModuleEntity> modules) {
         this.modules = modules;
     }
 
