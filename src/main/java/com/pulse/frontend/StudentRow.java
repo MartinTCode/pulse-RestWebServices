@@ -17,15 +17,29 @@ public class StudentRow {
     private final ObjectProperty<LocalDate> exDatum = new SimpleObjectProperty<>(null);
     private final StringProperty status = new SimpleStringProperty("");
     private final StringProperty information = new SimpleStringProperty("");
+    private final StringProperty personalNo = new SimpleStringProperty("");
 
     // Constructor
-    public StudentRow(String namn, String omdome, String betyg, LocalDate exDatum, String status, String information) {
+    public StudentRow(String personalNo, String namn, String omdome, String betyg, LocalDate exDatum, String status, String information) {
+        this.personalNo.set(personalNo);
         this.namn.set(namn);
         this.omdome.set(omdome);
         this.betyg.set(betyg);
         this.exDatum.set(exDatum);
         this.status.set(status);
         this.information.set(information);
+        
+    }
+
+    // PersonalNo
+    public StringProperty personalNoProperty() { 
+        return personalNo; 
+    }
+    public String getPersonalNo() { 
+        return personalNo.get(); 
+    }
+    public void setPersonalNo(String v) { 
+        personalNo.set(v); 
     }
 
     // Checkbox

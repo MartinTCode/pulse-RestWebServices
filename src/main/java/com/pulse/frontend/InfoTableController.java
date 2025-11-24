@@ -1,12 +1,17 @@
 package com.pulse.frontend;
 
+import com.pulse.canvasmock.CanvasMockData;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class InfoTableController {
 
@@ -22,6 +27,11 @@ public class InfoTableController {
     @FXML private Button markeraAllaButton;
     @FXML private Button markeraBetygsattaButton;
     @FXML private Button markeraIngabutton;
+    @FXML private Button overforMarkeradeButton;
+
+    @FXML private ComboBox<String> kurskodBox;
+    @FXML private ComboBox<String> modulBox;
+    @FXML private ComboBox<String> uppgiftBox;
 
     @FXML private DatePicker datumMarkerade;
     @FXML private Button sattDatumButton;
@@ -58,6 +68,15 @@ public class InfoTableController {
         exdatumColumn.setCellValueFactory(c -> c.getValue().exDatumProperty());
         exdatumColumn.setCellFactory(col -> new DatePickerTableCell<>());
         exdatumColumn.setEditable(true);
+
+        // Populate combobox with available courses
+        kurskodBox.setItems(FXCollections.observableArrayList(
+            CanvasMockData.getInstance().getAvailableCourses()
+        ));
+
+        kurskodBox.setOnAction(e -> loadAssignments());
+
+        uppgiftBox.setOnAction(e -> loadModules());
 
         // Add empty data
         infoTableView.setItems(data);
@@ -98,7 +117,8 @@ public class InfoTableController {
             infoTableView.refresh();
         });
 
-        
+        overforMarkeradeButton.setOnAction(e -> overforMarkerade());
+
     }
     // Update label for "antal markerade"
     private void updateAntalMarkerade() {
@@ -175,5 +195,105 @@ public class InfoTableController {
                 }
             }
         }
+    }
+
+    private void overforMarkerade() {
+        //Get selected rows
+        var selectedRows = data.stream().filter(StudentRow::isSelected).toList();
+
+        if (selectedRows.isEmpty()) {
+            showAlert ("Inga markerade rader", "Vänligen markera minst en rad för att överföra.");
+            return;
+
+        }
+
+        if (kurskodBox.getValue() == null || modulBox.getValue() == null) {
+            showAlert("Saknas val", "Välj både kurskod och modul innan du överför.");
+            return;
+        }
+
+        // split module code if needed
+        String moduleCode = modulBox.getValue().split(" ")[0];
+
+        //Convert to DTO objects for backend transfer
+        var dtoList = selectedRows.stream()
+                .map(row -> new LadokResultDTO(
+                        row.getPersonalNo(),
+                        kurskodBox.getValue(), 
+                        moduleCode, 
+                        row.getBetyg(),
+                        row.getExDatum()
+                )).toList();
+
+        // POST to backend
+        new Thread(() -> {
+            try {
+                var responseList = LadokApiClient.sendResults(dtoList);
+
+                //Update UI based on response
+                javafx.application.Platform.runLater(() -> {
+                    for (var res : responseList) {
+                        selectedRows.stream()
+                            .filter(row -> row.getPersonalNo().equals(res.personalNo()))
+                            .forEach (r -> {
+                                r.setStatus(res.status());
+                                r.setInformation(res.info());
+
+                            });
+
+                    }
+                    infoTableView.refresh();
+
+                });
+
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    showAlert("Fel vid överföring", e.getMessage());
+                });
+
+            }
+
+        }).start();        
+
+    }
+
+    private void showAlert(String title, String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle(title);
+            a.setHeaderText(null);
+            a.setContentText(msg);
+            a.showAndWait();
+    }
+
+
+    private void loadAssignments() {
+        String courseId = kurskodBox.getValue();
+        if (courseId == null) return;
+
+        var assignments = CanvasMockData.getInstance().getAssignmentsForCourse(courseId);
+
+        uppgiftBox.setItems(FXCollections.observableArrayList( 
+            assignments.stream().map(a -> a.getAssignmentName()).toList()
+        ));
+
+        uppgiftBox.getSelectionModel().clearSelection();
+        modulBox.getSelectionModel().clearSelection();
+        data.clear();
+
+    }
+
+    private void loadModules() {
+        String assignment = uppgiftBox.getValue();
+        String courseId = kurskodBox.getValue();
+        if (assignment == null) return;
+
+        //REST call to get modules for selected assignment
+
+    }
+
+    private void loadStudents() {
+        //REST call to get students for selected module
+        //Populate data list
+
     }
 }
