@@ -22,6 +22,10 @@ public class InfoTableController {
     @FXML private Button markeraAllaButton;
     @FXML private Button markeraBetygsattaButton;
     @FXML private Button markeraIngabutton;
+    @FXML private Button overforMarkeradeButton;
+
+    @FXML private ComboBox<String> kurskodBox;
+    @FXML private ComboBox<String> modulBox;
 
     @FXML private DatePicker datumMarkerade;
     @FXML private Button sattDatumButton;
@@ -98,7 +102,8 @@ public class InfoTableController {
             infoTableView.refresh();
         });
 
-        
+        overforMarkeradeButton.setOnAction(e -> overforMarkerade());
+
     }
     // Update label for "antal markerade"
     private void updateAntalMarkerade() {
@@ -176,4 +181,74 @@ public class InfoTableController {
             }
         }
     }
+
+    private void overforMarkerade() {
+        //Get selected rows
+        var selectedRows = data.stream().filter(StudentRow::isSelected).toList();
+
+        if (selectedRows.isEmpty()) {
+            showAlert ("Inga markerade rader", "Vänligen markera minst en rad för att överföra.");
+            return;
+
+        }
+
+        if (kurskodBox.getValue() == null || modulBox.getValue() == null) {
+            showAlert("Saknas val", "Välj både kurskod och modul innan du överför.");
+            return;
+        }
+
+        // split module code if needed
+        String moduleCode = modulBox.getValue().split(" ")[0];
+
+        //Convert to DTO objects for backend transfer
+        var dtoList = selectedRows.stream()
+                .map(row -> new LadokResultDTO(
+                        row.getPersonalNo(),
+                        kurskodBox.getValue(), 
+                        moduleCode, 
+                        row.getBetyg(),
+                        row.getExDatum()
+                )).toList();
+
+        // POST to backend
+        new Thread(() -> {
+            try {
+                var responseList = LadokApiClient.sendResults(dtoList);
+
+                //Update UI based on response
+                javafx.application.Platform.runLater(() -> {
+                    for (var res : responseList) {
+                        selectedRows.stream()
+                            .filter(row -> row.getPersonalNo().equals(res.personalNo()))
+                            .forEach (r -> {
+                                r.setStatus(res.status());
+                                r.setInformation(res.info());
+
+                            });
+
+                    }
+                    infoTableView.refresh();
+
+                });
+
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    showAlert("Fel vid överföring", e.getMessage());
+                });
+
+            }
+
+        }).start();        
+
+    }
+
+    private void showAlert(String title, String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle(title);
+            a.setHeaderText(null);
+            a.setContentText(msg);
+            a.showAndWait();
+    }
+
+
 }
