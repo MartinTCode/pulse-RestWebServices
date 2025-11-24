@@ -1,12 +1,17 @@
 package com.pulse.frontend;
 
+import com.pulse.canvasmock.CanvasMockData;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class InfoTableController {
 
@@ -26,6 +31,7 @@ public class InfoTableController {
 
     @FXML private ComboBox<String> kurskodBox;
     @FXML private ComboBox<String> modulBox;
+    @FXML private ComboBox<String> uppgiftBox;
 
     @FXML private DatePicker datumMarkerade;
     @FXML private Button sattDatumButton;
@@ -62,6 +68,15 @@ public class InfoTableController {
         exdatumColumn.setCellValueFactory(c -> c.getValue().exDatumProperty());
         exdatumColumn.setCellFactory(col -> new DatePickerTableCell<>());
         exdatumColumn.setEditable(true);
+
+        // Populate combobox with available courses
+        kurskodBox.setItems(FXCollections.observableArrayList(
+            CanvasMockData.getInstance().getAvailableCourses()
+        ));
+
+        kurskodBox.setOnAction(e -> loadAssignments());
+
+        uppgiftBox.setOnAction(e -> loadModules());
 
         // Add empty data
         infoTableView.setItems(data);
@@ -251,4 +266,34 @@ public class InfoTableController {
     }
 
 
+    private void loadAssignments() {
+        String courseId = kurskodBox.getValue();
+        if (courseId == null) return;
+
+        var assignments = CanvasMockData.getInstance().getAssignmentsForCourse(courseId);
+
+        uppgiftBox.setItems(FXCollections.observableArrayList( 
+            assignments.stream().map(a -> a.getAssignmentName()).toList()
+        ));
+
+        uppgiftBox.getSelectionModel().clearSelection();
+        modulBox.getSelectionModel().clearSelection();
+        data.clear();
+
+    }
+
+    private void loadModules() {
+        String assignment = uppgiftBox.getValue();
+        String courseId = kurskodBox.getValue();
+        if (assignment == null) return;
+
+        //REST call to get modules for selected assignment
+
+    }
+
+    private void loadStudents() {
+        //REST call to get students for selected module
+        //Populate data list
+
+    }
 }
