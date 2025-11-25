@@ -1,6 +1,8 @@
-package com.pulse.frontend;
+package com.pulse.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pulse.api.dto.LadokResponseDTO;
+import com.pulse.api.dto.LadokResultDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.net.URI;

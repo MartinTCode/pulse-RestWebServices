@@ -1,4 +1,4 @@
-package com.pulse.frontend;
+package com.pulse.api.dto;
 
 import java.time.LocalDate;
 

@@ -1,5 +1,7 @@
 package com.pulse.frontend;
 
+import com.pulse.api.LadokApiClient;
+import com.pulse.api.dto.LadokResultDTO;
 import com.pulse.canvasmock.CanvasMockData;
 import com.pulse.canvasmock.CanvasStudentResult;
 
