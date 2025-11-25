@@ -8,6 +8,16 @@ public class CanvasStudentResult {
     private String studentName;
     private String canvasGrade;
 
+    //Constructors
+    public CanvasStudentResult() {
+    }
+
+    public CanvasStudentResult(String studentId, String studentName, String canvasGrade) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.canvasGrade = canvasGrade;
+    }
+
     // Getters and Setters
     public String getStudentId() {
         return studentId;

@@ -1,6 +1,7 @@
 package com.pulse.frontend;
 
 import com.pulse.canvasmock.CanvasMockData;
+import com.pulse.canvasmock.CanvasStudentResult;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -77,6 +78,8 @@ public class InfoTableController {
         kurskodBox.setOnAction(e -> loadAssignments());
 
         uppgiftBox.setOnAction(e -> loadModules());
+
+        modulBox.setOnAction(e -> loadStudents());
 
         // Add empty data
         infoTableView.setItems(data);
@@ -283,7 +286,6 @@ public class InfoTableController {
     }
 
     private void loadModules() {
-        System.out.println("Loading modules...");
         String assignment = uppgiftBox.getValue();
         if (assignment == null) return;
 
@@ -293,8 +295,40 @@ public class InfoTableController {
     }
 
     private void loadStudents() {
-        //REST call to get students for selected module
-        //Populate data list
-
+        String courseId = kurskodBox.getValue();
+        String assignment = uppgiftBox.getValue();
+        String module = modulBox.getValue();
+        
+        if (courseId == null || assignment == null || module == null) {
+            return;
+        }
+        
+        // Extract module code from the string (e.g., "EA001 - Description" -> "EA001")
+        String moduleCode = module.split(" ")[0];
+        
+        // Clear existing data
+        data.clear();
+        
+        // Get student results from Canvas mock data
+        List<CanvasStudentResult> results = CanvasMockData.getInstance()
+            .getResults(courseId, assignment);
+        
+        // Filter results by module code and convert to StudentRow
+        for (CanvasStudentResult result : results) {
+            // Only add students for the selected module
+            // You may need to adjust this if CanvasStudentResult has module information
+            StudentRow row = new StudentRow(
+                result.getStudentId(),            // personalNo
+                result.getStudentName(),          // namn
+                result.getCanvasGrade(),          // omdome (Canvas grade)
+                "",                        // betyg (empty initially)
+                null,                    // exDatum (null initially)
+                "",                       // status (empty initially)
+                ""                   // information (empty initially)
+            );
+            data.add(row);
+        }
+        
+        updateAntalMarkerade();
     }
 }
