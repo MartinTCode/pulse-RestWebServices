@@ -283,12 +283,13 @@ public class InfoTableController {
     }
 
     private void loadModules() {
+        System.out.println("Loading modules...");
         String assignment = uppgiftBox.getValue();
-        String courseId = kurskodBox.getValue();
         if (assignment == null) return;
 
-        //REST call to get modules for selected assignment
+        List<String> modules = CanvasMockData.getInstance().getModulesForAssignment(assignment);
 
+        modulBox.setItems(FXCollections.observableArrayList(modules));
     }
 
     private void loadStudents() {
