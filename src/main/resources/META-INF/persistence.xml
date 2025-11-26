@@ -32,8 +32,8 @@
     <!-- Epok persistence unit -->
     <persistence-unit name="epokPU">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>com.pulse.epok.entity.Course</class>
-        <class>com.pulse.epok.entity.Module</class>
+        <class>com.pulse.entity.EpokCourseEntity</class>
+        <class>com.pulse.entity.EpokModuleEntity</class>
 
         <properties>
 

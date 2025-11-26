@@ -21,7 +21,7 @@ public class EpokModuleDAO {
     
     //find all modules
     public List<EpokModuleEntity> findAllModules(){
-        TypedQuery<EpokModuleEntity> query = em.createQuery("SELECT m FROM Module m", EpokModuleEntity.class);
+        TypedQuery<EpokModuleEntity> query = em.createQuery("SELECT m FROM EpokModuleEntity m", EpokModuleEntity.class);
         return query.getResultList();
     }
 
@@ -29,7 +29,7 @@ public class EpokModuleDAO {
     public List<EpokModuleEntity> findModulesByCourseId(String courseId) {
         TypedQuery<EpokModuleEntity> query =
                 em.createQuery(
-                        "SELECT m FROM Module m WHERE m.course.courseId = :courseId",
+                        "SELECT m FROM EpokModuleEntity m WHERE m.course.courseId = :courseId",
                         EpokModuleEntity.class
                 );
         query.setParameter("courseId", courseId);

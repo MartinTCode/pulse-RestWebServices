@@ -1,6 +1,8 @@
 package com.pulse.frontend;
 
+import com.pulse.api.EpokApiClient;
 import com.pulse.api.LadokApiClient;
+import com.pulse.api.dto.EpokModuleDTO;
 import com.pulse.api.dto.LadokResultDTO;
 import com.pulse.canvasmock.CanvasMockData;
 import com.pulse.canvasmock.CanvasStudentResult;
@@ -77,7 +79,10 @@ public class InfoTableController {
             CanvasMockData.getInstance().getAvailableCourses()
         ));
 
-        kurskodBox.setOnAction(e -> loadAssignments());
+        kurskodBox.setOnAction(e -> {
+            loadAssignments();
+            loadModules(); //get modules via REST
+        });
 
         uppgiftBox.setOnAction(e -> loadModules());
 
@@ -288,49 +293,57 @@ public class InfoTableController {
     }
 
     private void loadModules() {
-        String assignment = uppgiftBox.getValue();
-        if (assignment == null) return;
+    String courseId = kurskodBox.getValue();
+    if (courseId == null) return;
 
-        List<String> modules = CanvasMockData.getInstance().getModulesForAssignment(assignment);
+    new Thread(() -> {
+        try {
+            List<EpokModuleDTO> modules = EpokApiClient.getModulesByCourseId(courseId);
 
-        modulBox.setItems(FXCollections.observableArrayList(modules));
+            javafx.application.Platform.runLater(() -> {
+                modulBox.setItems(FXCollections.observableArrayList(
+                    modules.stream()
+                           .map(m -> m.moduleCode() + " " + m.moduleName())
+                           .toList()
+                    ));
+                    modulBox.getSelectionModel().clearSelection();
+                });
+
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() ->
+                    showAlert("Fel", "Kunde inte hämta moduler: " + e.getMessage())
+                );
+            }
+        }).start();
     }
 
     private void loadStudents() {
         String courseId = kurskodBox.getValue();
         String assignment = uppgiftBox.getValue();
-        String module = modulBox.getValue();
         
-        if (courseId == null || assignment == null || module == null) {
+        if (courseId == null || assignment == null) {
             return;
         }
-        
-        // Extract module code from the string (e.g., "EA001 - Description" -> "EA001")
-        String moduleCode = module.split(" ")[0];
-        
-        // Clear existing data
         data.clear();
         
-        // Get student results from Canvas mock data
         List<CanvasStudentResult> results = CanvasMockData.getInstance()
             .getResults(courseId, assignment);
-        
-        // Filter results by module code and convert to StudentRow
+
         for (CanvasStudentResult result : results) {
-            // Only add students for the selected module
-            // You may need to adjust this if CanvasStudentResult has module information
             StudentRow row = new StudentRow(
-                result.getStudentId(),            // personalNo
-                result.getStudentName(),          // namn
-                result.getCanvasGrade(),          // omdome (Canvas grade)
-                "",                        // betyg (empty initially)
-                null,                    // exDatum (null initially)
-                "",                       // status (empty initially)
-                ""                   // information (empty initially)
+                result.getStudentId(),
+                result.getStudentName(),
+                result.getCanvasGrade(),
+                "",
+                null,
+                "",
+                ""
             );
             data.add(row);
-        }
-        
-        updateAntalMarkerade();
+
+        }   
+        updateAntalMarkerade();    
+
     }
-}
+
+}    

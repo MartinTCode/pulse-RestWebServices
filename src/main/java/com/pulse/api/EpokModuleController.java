@@ -1,6 +1,7 @@
 package com.pulse.api;
 
 import com.pulse.service.EpokModuleService;
+import com.pulse.api.dto.EpokModuleDTO;
 import com.pulse.config.EntityManagerFactoryProvider;
 import com.pulse.dao.EpokModuleDAO;
 import com.pulse.entity.EpokModuleEntity;
@@ -32,7 +33,18 @@ public class EpokModuleController {
     public Response getModulesByCourseId(@PathParam("courseId") String courseId) {
         try {
             List<EpokModuleEntity> modules = moduleService.getModulesByCourseId(courseId);
-            return Response.ok(modules).build();
+            
+            List<EpokModuleDTO> dtoList = modules.stream()
+                    .map(m -> new EpokModuleDTO(
+                            m.getModuleId(),
+                            m.getModuleCode(),
+                            m.getModuleName(),
+                            m.getCourse().getCourseId(),
+                            null
+                    ))
+                    .toList();
+
+            return Response.ok(dtoList).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
