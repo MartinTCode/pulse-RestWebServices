@@ -18,7 +18,7 @@ public class LadokApiClient {
             .build();
 
     private static final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule()); // ✅ Handle LocalDate
+            .registerModule(new JavaTimeModule()); // Handle LocalDate
 
     private static final String URL = "http://localhost:8080/api/ladok/transfer";
 
