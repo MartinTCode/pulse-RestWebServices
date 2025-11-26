@@ -1,16 +1,20 @@
 package com.pulse.api;
 
-import com.pulse.api.dto.LadokRegisterResultRequest;
+import com.pulse.api.dto.LadokResultDTO;
+import com.pulse.api.dto.LadokResponseDTO;
 import com.pulse.config.EntityManagerFactoryProvider;
 import com.pulse.dao.LadokResultDAO;
 import com.pulse.entity.LadokResultEntity;
 import com.pulse.service.LadokResultService;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Path("/ladok")
@@ -18,28 +22,27 @@ import java.util.Map;
 @Consumes(MediaType.APPLICATION_JSON)
 public class LadokResultController {
 
-    private final LadokResultService resultService;
+    private final EntityManagerFactory emf;
 
     public LadokResultController() {
-        EntityManager em = EntityManagerFactoryProvider
-                .getFactory("ladokPU")
-                .createEntityManager();
-
-        LadokResultDAO dao = new LadokResultDAO(em);
-        this.resultService = new LadokResultService(dao);
+        this.emf = EntityManagerFactoryProvider.getFactory("ladokPU");
     }
 
     // Assignment spec: reg_Resultat
     @POST
     @Path("/results")
-    public Response registerResult(LadokRegisterResultRequest req) {
+    public Response registerResult(LadokResultDTO req) {
+        EntityManager em = emf.createEntityManager();
         try {
-            LadokResultEntity saved = resultService.registerResult(
-                    req.getPersonalNo(),
-                    req.getCourseId(),
-                    req.getModuleCode(),
-                    req.getExamDate(),
-                    req.getGrade()
+            LadokResultDAO dao = new LadokResultDAO(em);
+            LadokResultService service = new LadokResultService(dao);
+            
+            LadokResultEntity saved = service.registerResult(
+                    req.personalNo(),
+                    req.courseId(),
+                    req.moduleCode(),
+                    req.examDate(),
+                    req.grade()
             );
 
             return Response.status(Response.Status.CREATED).entity(saved).build();
@@ -53,6 +56,61 @@ public class LadokResultController {
             return Response.serverError()
                     .entity(Map.of("error", "Internal server error"))
                     .build();
+        } finally {
+            em.close();
+        }
+    }
+
+    // Batch transfer endpoint
+    @POST
+    @Path("/transfer")
+    public Response transferResults(List<LadokResultDTO> requests) {
+        EntityManager em = emf.createEntityManager();
+        List<LadokResponseDTO> responses = new ArrayList<>();
+
+        try {
+            LadokResultDAO dao = new LadokResultDAO(em);
+            LadokResultService service = new LadokResultService(dao);
+
+            for (LadokResultDTO req : requests) {
+                try {
+                    // Service handles all validation
+                    LadokResultEntity saved = service.registerResult(
+                            req.personalNo(),
+                            req.courseId(),
+                            req.moduleCode(),
+                            req.examDate(),
+                            req.grade()
+                    );
+
+                    responses.add(new LadokResponseDTO(
+                            req.personalNo(),
+                            "SUCCESS",
+                            "Resultat registrerat med ID: " + saved.getResultId()
+                    ));
+
+                } catch (IllegalArgumentException e) {
+                    // Service validation failed - return user-friendly message
+                    responses.add(new LadokResponseDTO(
+                            req.personalNo(),
+                            "FAILED",
+                            e.getMessage()
+                    ));
+
+                } catch (Exception e) {
+                    // Unexpected error (database, etc.)
+                    responses.add(new LadokResponseDTO(
+                            req.personalNo(),
+                            "FAILED",
+                            "Serverfel: " + e.getMessage()
+                    ));
+                }
+            }
+
+            return Response.ok(responses).build();
+            
+        } finally {
+            em.close();
         }
     }
 }

@@ -210,13 +210,12 @@ public class InfoTableController {
     }
 
     private void overforMarkerade() {
-        //Get selected rows
+        // Get selected rows
         var selectedRows = data.stream().filter(StudentRow::isSelected).toList();
 
         if (selectedRows.isEmpty()) {
-            showAlert ("Inga markerade rader", "Vänligen markera minst en rad för att överföra.");
+            showAlert("Inga markerade rader", "Vänligen markera minst en rad för att överföra.");
             return;
-
         }
 
         if (kurskodBox.getValue() == null || modulBox.getValue() == null) {
@@ -224,49 +223,87 @@ public class InfoTableController {
             return;
         }
 
-        // split module code if needed
+        // Validate that selected rows have required data
+        boolean hasInvalidRows = selectedRows.stream()
+            .anyMatch(row -> row.getBetyg() == null || row.getBetyg().isBlank() || 
+                            row.getExDatum() == null ||
+                            row.getPersonalNo() == null || row.getPersonalNo().isBlank());
+        
+        if (hasInvalidRows) {
+            showAlert("Ofullständig data", 
+                "Alla markerade rader måste ha betyg, examinationsdatum och personnummer.");
+            return;
+        }
+
+        // Split module code if needed
         String moduleCode = modulBox.getValue().split(" ")[0];
+        String courseId = kurskodBox.getValue();
 
-        //Convert to DTO objects for backend transfer
+        // Convert to DTO objects for backend transfer
         var dtoList = selectedRows.stream()
-                .map(row -> new LadokResultDTO(
-                        row.getPersonalNo(),
-                        kurskodBox.getValue(), 
-                        moduleCode, 
-                        row.getBetyg(),
-                        row.getExDatum()
-                )).toList();
+            .map(row -> new LadokResultDTO(
+                row.getPersonalNo(),
+                courseId,
+                moduleCode,
+                row.getBetyg(),
+                row.getExDatum()
+            )).toList();
 
+        // Disable button during transfer
+        overforMarkeradeButton.setDisable(true);
+        
         // POST to backend
         new Thread(() -> {
             try {
                 var responseList = LadokApiClient.sendResults(dtoList);
 
-                //Update UI based on response
+                // Update UI based on response
                 javafx.application.Platform.runLater(() -> {
+                    int successCount = 0;
+                    int failCount = 0;
+                    
                     for (var res : responseList) {
                         selectedRows.stream()
                             .filter(row -> row.getPersonalNo().equals(res.personalNo()))
-                            .forEach (r -> {
+                            .forEach(r -> {
                                 r.setStatus(res.status());
                                 r.setInformation(res.info());
-
                             });
-
+                        
+                        if ("SUCCESS".equals(res.status())) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
                     }
+                    
                     infoTableView.refresh();
-
+                    
+                    // Show summary
+                    String summary = String.format(
+                        "Överföring klar!\n\nLyckade: %d\nMisslyckade: %d\nTotalt: %d",
+                        successCount, failCount, responseList.size()
+                    );
+                    
+                    showAlert(
+                        failCount == 0 ? "Överföring lyckades" : "Överföring delvis lyckad",
+                        summary
+                    );
+                    
+                    // Re-enable button
+                    overforMarkeradeButton.setDisable(false);
                 });
 
             } catch (Exception e) {
                 javafx.application.Platform.runLater(() -> {
-                    showAlert("Fel vid överföring", e.getMessage());
+                    showAlert("Fel vid överföring", 
+                        "Ett fel uppstod vid överföring till Ladok:\n" + e.getMessage());
+                    overforMarkeradeButton.setDisable(false);
                 });
-
+                e.printStackTrace(); // Log to console for debugging
             }
 
-        }).start();        
-
+        }).start();
     }
 
     private void showAlert(String title, String msg) {
