@@ -11,10 +11,14 @@ public class CanvasMockData {
     //List of courses, containing assignments which contain student results
     private List<CanvasCourse> courses;
 
+    //List of assignments
+    private List<CanvasAssignment> assignments;
+
     // Constructor
     private CanvasMockData() {
         // Initialize list of courses
         courses = new ArrayList<>();
+        assignments = new ArrayList<>();
 
         // Course 1 - EA & SOA
         CanvasCourse course1 = new CanvasCourse();
@@ -26,7 +30,9 @@ public class CanvasMockData {
 
             // First assignment in course 1
             CanvasAssignment assignment1 = new CanvasAssignment();
+            assignments.add(assignment1);
             assignment1.setAssignmentName("0005 - Inlämningsuppgifter");
+            assignment1.setModuleCode("EA001");
 
                 // List of student results for assignment 1
                 assignment1.setResults(new ArrayList<>());
@@ -63,7 +69,9 @@ public class CanvasMockData {
 
             // Second assignment in course 1
             CanvasAssignment assignment2 = new CanvasAssignment();
+            assignments.add(assignment2);
             assignment2.setAssignmentName("0006 - Projekt");
+            assignment2.setModuleCode("EA002");
 
                 // List of student results for assignment 2
                 assignment2.setResults(new ArrayList<>());
@@ -107,7 +115,9 @@ public class CanvasMockData {
 
             // First assignment in course 2
             CanvasAssignment assignment3 = new CanvasAssignment();
+            assignments.add(assignment3);
             assignment3.setAssignmentName("0001 - Projektuppgifter/Individuella uppgifter");
+            assignment3.setModuleCode("DM001");
 
                 // List of student results for assignment 3
                 assignment3.setResults(new ArrayList<>());
@@ -143,7 +153,9 @@ public class CanvasMockData {
 
             // Second assignment in course 2
             CanvasAssignment assignment4 = new CanvasAssignment();
+            assignments.add(assignment4);
             assignment4.setAssignmentName("0002 - Tentamen");
+            assignment4.setModuleCode("DM002");
 
                 // List of student results for assignment 4
                 assignment4.setResults(new ArrayList<>());
@@ -188,6 +200,7 @@ public class CanvasMockData {
 
             // First assignment in course 3
             CanvasAssignment assignment5 = new CanvasAssignment();
+            assignments.add(assignment5);
             assignment5.setAssignmentName("0003 - Individuell uppgift");
 
                 // List of student results for assignment 5
@@ -224,7 +237,9 @@ public class CanvasMockData {
 
             // Second assignment in course 3
             CanvasAssignment assignment6 = new CanvasAssignment();
+            assignments.add(assignment6);
             assignment6.setAssignmentName("0004 - Projekt");
+            assignment6.setModuleCode("FM001");
 
                 // List of student results for assignment 6
                 assignment6.setResults(new ArrayList<>());
@@ -293,6 +308,18 @@ public class CanvasMockData {
             }
         }
         return new ArrayList<>();
+    }
+
+    public List<String> getModulesForAssignment(String assignmentName) {
+        List<String> moduleCodes = new ArrayList<>();
+        for (CanvasCourse course : courses) {
+            for (CanvasAssignment assignment : course.getAssignments()) {
+                if (assignment.getAssignmentName().equals(assignmentName)) {
+                    moduleCodes.add(assignment.getModuleCode());
+                }
+            }
+        }
+        return moduleCodes;
     }
 
     public List<CanvasStudentResult> getResults(String courseId, String assignmentName) {

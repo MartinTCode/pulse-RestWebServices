@@ -5,6 +5,7 @@ import java.util.List;
 public class CanvasAssignment {
     private String assignmentName;
     private List<CanvasStudentResult> results;
+    private String moduleCode;
 
     // Getters and Setters
     public String getAssignmentName() {
@@ -21,5 +22,13 @@ public class CanvasAssignment {
 
     public void setResults(List<CanvasStudentResult> results) {
         this.results = results;
+    }
+
+    public String getModuleCode() {
+        return moduleCode;
+    }
+
+    public void setModuleCode(String moduleCode) {
+        this.moduleCode = moduleCode;
     }
 }

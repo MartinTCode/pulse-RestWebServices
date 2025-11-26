@@ -1,6 +1,13 @@
 package com.pulse.frontend;
 
+import com.pulse.api.EpokApiClient;
+import com.pulse.api.LadokApiClient;
+import com.pulse.api.StudentItsApiClient;
+import com.pulse.api.dto.EpokModuleDTO;
+import com.pulse.api.dto.LadokResultDTO;
+import com.pulse.api.dto.StudentItsDTO;
 import com.pulse.canvasmock.CanvasMockData;
+import com.pulse.canvasmock.CanvasStudentResult;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,7 +18,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class InfoTableController {
 
@@ -32,6 +38,7 @@ public class InfoTableController {
     @FXML private ComboBox<String> kurskodBox;
     @FXML private ComboBox<String> modulBox;
     @FXML private ComboBox<String> uppgiftBox;
+    @FXML private ComboBox<String> sparaUtkastBox;
 
     @FXML private DatePicker datumMarkerade;
     @FXML private Button sattDatumButton;
@@ -42,6 +49,8 @@ public class InfoTableController {
 
     @FXML
     public void initialize() {
+
+        sparaUtkastBox.setVisible(false);
 
         infoTableView.setEditable(true);
 
@@ -74,9 +83,14 @@ public class InfoTableController {
             CanvasMockData.getInstance().getAvailableCourses()
         ));
 
-        kurskodBox.setOnAction(e -> loadAssignments());
+        kurskodBox.setOnAction(e -> {
+            loadAssignments();
+            loadModules(); //get modules via REST
+        });
 
         uppgiftBox.setOnAction(e -> loadModules());
+
+        modulBox.setOnAction(e -> loadStudents());
 
         // Add empty data
         infoTableView.setItems(data);
@@ -198,13 +212,12 @@ public class InfoTableController {
     }
 
     private void overforMarkerade() {
-        //Get selected rows
+        // Get selected rows
         var selectedRows = data.stream().filter(StudentRow::isSelected).toList();
 
         if (selectedRows.isEmpty()) {
-            showAlert ("Inga markerade rader", "Vänligen markera minst en rad för att överföra.");
+            showAlert("Inga markerade rader", "Vänligen markera minst en rad för att överföra.");
             return;
-
         }
 
         if (kurskodBox.getValue() == null || modulBox.getValue() == null) {
@@ -212,49 +225,87 @@ public class InfoTableController {
             return;
         }
 
-        // split module code if needed
+        // Validate that selected rows have required data
+        boolean hasInvalidRows = selectedRows.stream()
+            .anyMatch(row -> row.getBetyg() == null || row.getBetyg().isBlank() || 
+                            row.getExDatum() == null ||
+                            row.getPersonalNo() == null || row.getPersonalNo().isBlank());
+        
+        if (hasInvalidRows) {
+            showAlert("Ofullständig data", 
+                "Alla markerade rader måste ha betyg, examinationsdatum och personnummer.");
+            return;
+        }
+
+        // Split module code if needed
         String moduleCode = modulBox.getValue().split(" ")[0];
+        String courseId = kurskodBox.getValue();
 
-        //Convert to DTO objects for backend transfer
+        // Convert to DTO objects for backend transfer
         var dtoList = selectedRows.stream()
-                .map(row -> new LadokResultDTO(
-                        row.getPersonalNo(),
-                        kurskodBox.getValue(), 
-                        moduleCode, 
-                        row.getBetyg(),
-                        row.getExDatum()
-                )).toList();
+            .map(row -> new LadokResultDTO(
+                row.getPersonalNo(),
+                courseId,
+                moduleCode,
+                row.getBetyg(),
+                row.getExDatum()
+            )).toList();
 
+        // Disable button during transfer
+        overforMarkeradeButton.setDisable(true);
+        
         // POST to backend
         new Thread(() -> {
             try {
                 var responseList = LadokApiClient.sendResults(dtoList);
 
-                //Update UI based on response
+                // Update UI based on response
                 javafx.application.Platform.runLater(() -> {
+                    int successCount = 0;
+                    int failCount = 0;
+                    
                     for (var res : responseList) {
                         selectedRows.stream()
                             .filter(row -> row.getPersonalNo().equals(res.personalNo()))
-                            .forEach (r -> {
+                            .forEach(r -> {
                                 r.setStatus(res.status());
                                 r.setInformation(res.info());
-
                             });
-
+                        
+                        if ("SUCCESS".equals(res.status())) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
                     }
+                    
                     infoTableView.refresh();
-
+                    
+                    // Show summary
+                    String summary = String.format(
+                        "Överföring klar!\n\nLyckade: %d\nMisslyckade: %d\nTotalt: %d",
+                        successCount, failCount, responseList.size()
+                    );
+                    
+                    showAlert(
+                        failCount == 0 ? "Överföring lyckades" : "Överföring delvis lyckad",
+                        summary
+                    );
+                    
+                    // Re-enable button
+                    overforMarkeradeButton.setDisable(false);
                 });
 
             } catch (Exception e) {
                 javafx.application.Platform.runLater(() -> {
-                    showAlert("Fel vid överföring", e.getMessage());
+                    showAlert("Fel vid överföring", 
+                        "Ett fel uppstod vid överföring till Ladok:\n" + e.getMessage());
+                    overforMarkeradeButton.setDisable(false);
                 });
-
+                e.printStackTrace(); // Log to console for debugging
             }
 
-        }).start();        
-
+        }).start();
     }
 
     private void showAlert(String title, String msg) {
@@ -283,17 +334,84 @@ public class InfoTableController {
     }
 
     private void loadModules() {
-        String assignment = uppgiftBox.getValue();
         String courseId = kurskodBox.getValue();
-        if (assignment == null) return;
+        if (courseId == null) return;
 
-        //REST call to get modules for selected assignment
+        new Thread(() -> {
+            try {
+                List<EpokModuleDTO> modules = EpokApiClient.getModulesByCourseId(courseId);
 
-    }
+                javafx.application.Platform.runLater(() -> {
+                    modulBox.setItems(FXCollections.observableArrayList(
+                        modules.stream()
+                               .map(m -> m.moduleCode() + " " + m.moduleName())
+                               .toList()
+                        ));
+                        modulBox.getSelectionModel().clearSelection();
+                    });
+
+                } catch (Exception e) {
+                    javafx.application.Platform.runLater(() ->
+                        showAlert("Fel", "Kunde inte hämta moduler: " + e.getMessage())
+                    );
+                }
+            }).start();
+        }
 
     private void loadStudents() {
-        //REST call to get students for selected module
-        //Populate data list
+        String courseId = kurskodBox.getValue();
+        String assignment = uppgiftBox.getValue();
+        
+        if (courseId == null || assignment == null) {
+            return;
+        }
+        data.clear();
+        
+        List<CanvasStudentResult> results = CanvasMockData.getInstance()
+            .getResults(courseId, assignment);
 
+        // Fetch personal numbers in background thread
+        new Thread(() -> {
+            for (CanvasStudentResult result : results) {
+                String personalNo = "";
+                String info = "";
+                
+                try {
+                    // Fetch personal number from StudentITS
+                    StudentItsDTO student = StudentItsApiClient.getStudentByStudentId(result.getStudentId());
+                    
+                    if (student != null) {
+                        personalNo = student.personalNo();
+                    } else {
+                        info = "Personnummer saknas i StudentITS";
+                    }
+                    
+                } catch (Exception e) {
+                    info = "Fel vid hämtning av personnummer: " + e.getMessage();
+                }
+                
+                // Create row with fetched personal number
+                final String finalPersonalNo = personalNo;
+                final String finalInfo = info;
+                
+                javafx.application.Platform.runLater(() -> {
+                    StudentRow row = new StudentRow(
+                        finalPersonalNo,
+                        result.getStudentName(),
+                        result.getCanvasGrade(),
+                        "",
+                        null,
+                        "",
+                        finalInfo
+                    );
+                    data.add(row);
+                });
+            }
+            
+            // Update count after all students are loaded
+            javafx.application.Platform.runLater(this::updateAntalMarkerade);
+            
+        }).start();
     }
+
 }
