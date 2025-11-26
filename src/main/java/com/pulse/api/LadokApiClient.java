@@ -12,7 +12,11 @@ import java.util.List;
 
 public class LadokApiClient {
 
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final HttpClient client = HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(30))
+            .version(HttpClient.Version.HTTP_1_1)
+            .build();
+
     private static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()); // ✅ Handle LocalDate
 
