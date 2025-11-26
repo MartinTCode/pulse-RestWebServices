@@ -18,7 +18,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class InfoTableController {
 
@@ -39,6 +38,7 @@ public class InfoTableController {
     @FXML private ComboBox<String> kurskodBox;
     @FXML private ComboBox<String> modulBox;
     @FXML private ComboBox<String> uppgiftBox;
+    @FXML private ComboBox<String> sparaUtkastBox;
 
     @FXML private DatePicker datumMarkerade;
     @FXML private Button sattDatumButton;
@@ -49,6 +49,8 @@ public class InfoTableController {
 
     @FXML
     public void initialize() {
+
+        sparaUtkastBox.setVisible(false);
 
         infoTableView.setEditable(true);
 
