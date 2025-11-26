@@ -2,16 +2,19 @@ package com.pulse.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityManagerFactoryProvider {
-
-    private static final Map<String, EntityManagerFactory> factories = new HashMap<>();
-
-    public static EntityManagerFactory getFactory(String puName) {
-        return factories.computeIfAbsent(puName, Persistence::createEntityManagerFactory);
+    
+    private static final ConcurrentHashMap<String, EntityManagerFactory> factories = new ConcurrentHashMap<>();
+    
+    public static EntityManagerFactory getFactory(String persistenceUnitName) {
+        return factories.computeIfAbsent(persistenceUnitName, Persistence::createEntityManagerFactory);
     }
     
+    public static void closeAll() {
+        factories.values().forEach(EntityManagerFactory::close);
+        factories.clear();
+    }
 }
 
