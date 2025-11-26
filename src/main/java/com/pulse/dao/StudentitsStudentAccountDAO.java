@@ -21,10 +21,9 @@ public class StudentitsStudentAccountDAO {
     // Find by personal number
     public List<StudentitsStudentAccountEntity> findAccountsByPersonalNo(String personalNo) {
         TypedQuery<StudentitsStudentAccountEntity> query = em.createQuery(
-                "SELECT sa FROM StudentAccount sa WHERE sa.personalNo = :personalNo",
+                "SELECT sa FROM StudentitsStudentAccountEntity sa WHERE sa.personalNo = :personalNo",
                 StudentitsStudentAccountEntity.class);
         query.setParameter("personalNo", personalNo);
         return query.getResultList();
     }
-
 }

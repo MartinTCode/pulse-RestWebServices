@@ -2,8 +2,10 @@ package com.pulse.frontend;
 
 import com.pulse.api.EpokApiClient;
 import com.pulse.api.LadokApiClient;
+import com.pulse.api.StudentItsApiClient;
 import com.pulse.api.dto.EpokModuleDTO;
 import com.pulse.api.dto.LadokResultDTO;
+import com.pulse.api.dto.StudentItsDTO;
 import com.pulse.canvasmock.CanvasMockData;
 import com.pulse.canvasmock.CanvasStudentResult;
 
@@ -293,29 +295,29 @@ public class InfoTableController {
     }
 
     private void loadModules() {
-    String courseId = kurskodBox.getValue();
-    if (courseId == null) return;
+        String courseId = kurskodBox.getValue();
+        if (courseId == null) return;
 
-    new Thread(() -> {
-        try {
-            List<EpokModuleDTO> modules = EpokApiClient.getModulesByCourseId(courseId);
+        new Thread(() -> {
+            try {
+                List<EpokModuleDTO> modules = EpokApiClient.getModulesByCourseId(courseId);
 
-            javafx.application.Platform.runLater(() -> {
-                modulBox.setItems(FXCollections.observableArrayList(
-                    modules.stream()
-                           .map(m -> m.moduleCode() + " " + m.moduleName())
-                           .toList()
-                    ));
-                    modulBox.getSelectionModel().clearSelection();
-                });
+                javafx.application.Platform.runLater(() -> {
+                    modulBox.setItems(FXCollections.observableArrayList(
+                        modules.stream()
+                               .map(m -> m.moduleCode() + " " + m.moduleName())
+                               .toList()
+                        ));
+                        modulBox.getSelectionModel().clearSelection();
+                    });
 
-            } catch (Exception e) {
-                javafx.application.Platform.runLater(() ->
-                    showAlert("Fel", "Kunde inte hämta moduler: " + e.getMessage())
-                );
-            }
-        }).start();
-    }
+                } catch (Exception e) {
+                    javafx.application.Platform.runLater(() ->
+                        showAlert("Fel", "Kunde inte hämta moduler: " + e.getMessage())
+                    );
+                }
+            }).start();
+        }
 
     private void loadStudents() {
         String courseId = kurskodBox.getValue();
@@ -329,21 +331,48 @@ public class InfoTableController {
         List<CanvasStudentResult> results = CanvasMockData.getInstance()
             .getResults(courseId, assignment);
 
-        for (CanvasStudentResult result : results) {
-            StudentRow row = new StudentRow(
-                result.getStudentId(),
-                result.getStudentName(),
-                result.getCanvasGrade(),
-                "",
-                null,
-                "",
-                ""
-            );
-            data.add(row);
-
-        }   
-        updateAntalMarkerade();    
-
+        // Fetch personal numbers in background thread
+        new Thread(() -> {
+            for (CanvasStudentResult result : results) {
+                String personalNo = "";
+                String info = "";
+                
+                try {
+                    // Fetch personal number from StudentITS
+                    StudentItsDTO student = StudentItsApiClient.getStudentByStudentId(result.getStudentId());
+                    
+                    if (student != null) {
+                        personalNo = student.personalNo();
+                    } else {
+                        info = "Personnummer saknas i StudentITS";
+                    }
+                    
+                } catch (Exception e) {
+                    info = "Fel vid hämtning av personnummer: " + e.getMessage();
+                }
+                
+                // Create row with fetched personal number
+                final String finalPersonalNo = personalNo;
+                final String finalInfo = info;
+                
+                javafx.application.Platform.runLater(() -> {
+                    StudentRow row = new StudentRow(
+                        finalPersonalNo,
+                        result.getStudentName(),
+                        result.getCanvasGrade(),
+                        "",
+                        null,
+                        "",
+                        finalInfo
+                    );
+                    data.add(row);
+                });
+            }
+            
+            // Update count after all students are loaded
+            javafx.application.Platform.runLater(this::updateAntalMarkerade);
+            
+        }).start();
     }
 
-}    
+}
