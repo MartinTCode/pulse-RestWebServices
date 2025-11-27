@@ -2,6 +2,9 @@ package com.pulse.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * Entity class representing a Module in the Epok system
+ */
 @Entity
 @Table(name = "module", schema = "epok")
 public class EpokModuleEntity {
@@ -21,20 +24,28 @@ public class EpokModuleEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private EpokCourseEntity course;
 
-    // Constructors
+    /**
+     * Default constructor with no parameters to initialize the entity without setting any fields.
+     */
     public EpokModuleEntity() {
     }
 
+    /**
+     * Parameterized constructor to initialize the entity with specific values.
+     * @param moduleCode The code of the module
+     * @param moduleName The name of the module
+     * @param course The associated EpokCourseEntity
+     */
     public EpokModuleEntity(String moduleCode, String moduleName, EpokCourseEntity course) {
         this.moduleCode = moduleCode;
         this.moduleName = moduleName;
         this.course = course;
     }
 
-    // Getters and Setters
     public int getModuleId() {
         return moduleId;
     }
+
     public void setModuleId(int moduleId) {
         this.moduleId = moduleId;
     }
@@ -42,6 +53,7 @@ public class EpokModuleEntity {
     public String getModuleCode() {
         return moduleCode;
     }
+
     public void setModuleCode(String moduleCode) {
         this.moduleCode = moduleCode;
     }
@@ -49,6 +61,7 @@ public class EpokModuleEntity {
     public String getModuleName() {
         return moduleName;
     }
+
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
     }
@@ -56,6 +69,7 @@ public class EpokModuleEntity {
     public EpokCourseEntity getCourse() {
         return course;
     }
+    
     public void setCourse(EpokCourseEntity course) {
         this.course = course;
     }

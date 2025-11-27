@@ -2,6 +2,9 @@ package com.pulse.canvasmock;
 
 import java.util.List;
 
+/**
+ * Represents a Canvas assignment with its name, associated student results and module code.
+ */
 public class CanvasAssignment {
     private String assignmentName;
     private List<CanvasStudentResult> results;

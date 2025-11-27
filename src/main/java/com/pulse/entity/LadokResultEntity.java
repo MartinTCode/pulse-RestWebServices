@@ -3,6 +3,9 @@ package com.pulse.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+/**
+ * Entity class representing a Result in the Ladok system
+ */
 @Entity
 @Table(name = "result", schema = "ladok")
 public class LadokResultEntity {
@@ -26,9 +29,20 @@ public class LadokResultEntity {
     @Column(name = "grade", nullable = false, length = 5)
     private String grade;
 
-    // Constructors
+    /**
+     * Default constructor with no parameters to initialize the entity without setting any fields.
+     */
     public LadokResultEntity() {
     }
+
+    /**
+     * Parameterized constructor to initialize the entity with specific values.
+     * @param personalNo The personal number of the student 
+     * @param courseId The ID of the course
+     * @param moduleCode The code of the module
+     * @param examDate The date of the exam
+     * @param grade The grade received
+     */
     public LadokResultEntity(String personalNo, String courseId, String moduleCode, LocalDate examDate, String grade) {
         this.personalNo = personalNo;
         this.courseId = courseId;
@@ -37,7 +51,6 @@ public class LadokResultEntity {
         this.grade = grade;
     }
 
-    // Getters and Setters
     public int getResultId() {
         return resultId;
     }

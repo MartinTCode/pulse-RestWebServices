@@ -2,6 +2,9 @@ package com.pulse.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * Entity class representing a Student Account in the Student ITS system
+ */
 @Entity
 @Table(name = "student_account", schema = "studentits")
 public class StudentitsStudentAccountEntity {
@@ -12,16 +15,22 @@ public class StudentitsStudentAccountEntity {
     @Column(name = "personal_no", nullable = false, length = 20)
     private String personalNo;
 
-    //Constructors
+    /**
+     * Default constructor with no parameters to initialize the entity without setting any fields.
+     */
     public StudentitsStudentAccountEntity() {
     }
 
+    /**
+     * Parameterized constructor to initialize the entity with specific values.
+     * @param studentId The student ID
+     * @param personalNo The personal number
+     */
     public StudentitsStudentAccountEntity(String studentId, String personalNo) {
         this.studentId = studentId;
         this.personalNo = personalNo;
     }
 
-    // Getters and Setters
     public String getStudentId() {
         return studentId;
     }

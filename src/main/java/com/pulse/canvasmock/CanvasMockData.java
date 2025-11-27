@@ -3,6 +3,9 @@ package com.pulse.canvasmock;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Singleton class that holds mock data for Canvas courses, assignments and student results.
+ */
 public class CanvasMockData {
 
     // Singleton instance
@@ -14,7 +17,10 @@ public class CanvasMockData {
     //List of assignments
     private List<CanvasAssignment> assignments;
 
-    // Constructor
+    /**
+     * Private constructor to initialize mock data.
+     * Initializes the lists of courses and assignments with sample data.
+     */
     private CanvasMockData() {
         // Initialize list of courses
         courses = new ArrayList<>();
@@ -279,7 +285,6 @@ public class CanvasMockData {
         courses.add(course3);
     }
 
-    // Get instance of CanvasMockData
     public static CanvasMockData getInstance() {
         if (instance == null) {
             instance = new CanvasMockData();
@@ -287,13 +292,12 @@ public class CanvasMockData {
         return instance;
     }
         
-    //
+
     public List<CanvasCourse> getCourses() {
         return courses;
     }
 
-    // Methods to retrieve courses, assignments, and results
-        public List<String> getAvailableCourses() {
+    public List<String> getAvailableCourses() {
         List<String> courseIds = new ArrayList<>();
         for (CanvasCourse course : courses) {
             courseIds.add(course.getCourseId());
@@ -333,6 +337,5 @@ public class CanvasMockData {
             }
         }
         return new ArrayList<>();
-    }
-    
+    }  
 }

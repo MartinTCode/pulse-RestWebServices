@@ -15,10 +15,16 @@ import java.util.List;
 
 @Path("/modules")
 @Produces(MediaType.APPLICATION_JSON)
+/**
+ * Controller for handling Epok module-related API requests.
+ */
 public class EpokModuleController {
 
     private final EpokModuleService moduleService;
 
+    /**
+     * Constructor initializing the EpokModuleService with the appropriate DAO.
+     */
     public EpokModuleController() {
 
         EntityManager em = EntityManagerFactoryProvider
@@ -28,6 +34,12 @@ public class EpokModuleController {
         this.moduleService = new EpokModuleService(moduleDAO);
     }
 
+    /**
+     * Gets modules by course ID and returns them as DTOs.
+     * @param courseId The chosen ID of the course.
+     * @return Response containing a list of Epok Module Data Transfer Objects.
+     * @throws Exception if an error occurs during retrieval.
+     */
     @GET
     @Path("/{courseId}")
     public Response getModulesByCourseId(@PathParam("courseId") String courseId) {

@@ -6,6 +6,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * ConnectionFactory class to manage database connections using HikariCP connection pool.
+ */
 public class ConnectionFactory {
 
     private static final HikariDataSource dataSource;
