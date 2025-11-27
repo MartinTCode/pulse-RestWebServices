@@ -3,6 +3,9 @@ package com.pulse.config;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * DatabaseConfig class to load database configuration from properties file.
+ */
 public class DatabaseConfig {
     
     private static final Properties props = new Properties();

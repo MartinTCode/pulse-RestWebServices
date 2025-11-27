@@ -6,26 +6,43 @@ import java.util.List;
 
 import com.pulse.entity.EpokModuleEntity;
 
+/**
+ * Data Access Object for EpokModuleEntity
+ */
 public class EpokModuleDAO {
     private final EntityManager em;
 
-    //Constructor
+    /**
+     * Constructor that initialize EntityManager
+     * @param em EntityManager instance
+     */
     public EpokModuleDAO(EntityManager em){
         this.em = em;
     }
 
-    //find module by module id
+    /**
+     * Finds moduler by its module ID
+     * @param moduleId The ID of the module to find
+     * @return EpokModuleEntity instance if found, otherwise null
+     */
     public EpokModuleEntity findModuleById(int moduleId){
         return em.find(EpokModuleEntity.class, moduleId);
     }
     
-    //find all modules
+    /**
+     * Retrieves all modules from the database
+     * @return List of EpokModuleEntity instances
+     */
     public List<EpokModuleEntity> findAllModules(){
         TypedQuery<EpokModuleEntity> query = em.createQuery("SELECT m FROM EpokModuleEntity m", EpokModuleEntity.class);
         return query.getResultList();
     }
 
-    //find modules by course id
+    /**
+     * Finds modules by their course ID
+     * @param courseId The ID of the course whose modules to find
+     * @return List of EpokModuleEntity instances associated with the given course ID
+     */
     public List<EpokModuleEntity> findModulesByCourseId(String courseId) {
         TypedQuery<EpokModuleEntity> query =
                 em.createQuery(

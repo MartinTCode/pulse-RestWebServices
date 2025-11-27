@@ -4,6 +4,9 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * EntityManagerFactoryProvider class to manage EntityManagerFactory instances.
+ */
 public class EntityManagerFactoryProvider {
     
     private static final ConcurrentHashMap<String, EntityManagerFactory> factories = new ConcurrentHashMap<>();

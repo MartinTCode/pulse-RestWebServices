@@ -13,12 +13,18 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.Map;
 
+/**
+ * Controller for handling StudentITS student-related API requests.
+ */
 @Path("/student-its")
 @Produces(MediaType.APPLICATION_JSON)
 public class StudentitsStudentController {
 
     private final StudentitsStudentService studentService;
 
+    /**
+     * Constructor initializing the StudentItsStudentService with the appropriate DAO.
+     */
     public StudentitsStudentController() {
         EntityManager em = EntityManagerFactoryProvider
                 .getFactory("studentitsPU")
@@ -28,6 +34,12 @@ public class StudentitsStudentController {
         this.studentService = new StudentitsStudentService(dao);
     }
 
+    /**
+     * Gets a student by their student ID, and returns it as a Data Transfer Object.
+     * @param studentId The chosen student ID.
+     * @return Response containing the Student ITS Data Transfer Object or an error message.
+     * @throws Exception if an error occurs during retrieval.
+     */
     @GET
     @Path("/students/{studentId}")
     public Response getStudent(@PathParam("studentId") String studentId) {

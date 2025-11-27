@@ -5,6 +5,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+/**
+ * Resource for testing server functionality.
+ */
 @Path("/test")
 public class TestResource {
 

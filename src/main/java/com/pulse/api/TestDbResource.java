@@ -8,6 +8,9 @@ import jakarta.ws.rs.core.MediaType;
 
 @Path("/dbtest")
 
+/**
+ * Resource for testing database connectivity.
+ */
 public class TestDbResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)

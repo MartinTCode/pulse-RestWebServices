@@ -2,6 +2,9 @@ package com.pulse.canvasmock;
 
 import java.util.List;
 
+/**
+ * Represents a Canvas course with its ID, name and associated assignments.
+ */
 public class CanvasCourse {
     private String courseId;
     private String courseName;

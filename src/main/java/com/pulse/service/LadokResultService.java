@@ -5,29 +5,34 @@ import com.pulse.entity.LadokResultEntity;
 
 import java.time.LocalDate;
 
+/**
+ * Service responsible for registering exam results in the Ladok system.
+ * The service validates input and delegates persistence to an injected DAO.
+ */
 public class LadokResultService {
 
     private final LadokResultDAO resultDAO;
 
     /**
-     * Service responsible for registering exam results in the Ladok system.
-     *
-     * The service validates input at the boundary and delegates persistence to
-     * an injected DAO. This separation makes the class easy to unit-test with
-     * a stub DAO and keeps validation logic centralized.
-     *
-     * Contract:
-     * - Inputs: personalNo, courseId, moduleCode, examDate and grade (all required)
-     * - Outputs: a persisted LadokResultEntity
-     * - Errors: IllegalArgumentException for any missing/blank required field
+     * Constructor that initializes the LadokResultService with the given LadokResultDAO.
+     * @param resultDAO LadokResultDAO instance
      */
     public LadokResultService(LadokResultDAO resultDAO) {
         this.resultDAO = resultDAO;
     }
 
+    /**
+     * Registers a new exam result in the Ladok system.
+     * @param personalNo The personal number of the student
+     * @param courseId The ID of the course
+     * @param moduleCode The code of the module
+     * @param examDate The date of the exam
+     * @param grade The grade received
+     * @return The registered LadokResultEntity instance
+     * @throws IllegalArgumentException if any required input is null or invalid
+     */
     public LadokResultEntity registerResult(String personalNo, String courseId, String moduleCode, LocalDate examDate, String grade) {
-        // Validate required inputs. Using explicit checks keeps error messages
-        // clear and avoids creating invalid entities.
+        // Validate required inputs
         if (personalNo == null || personalNo.isBlank())
             throw new IllegalArgumentException("personalNo is required");
 
@@ -43,13 +48,11 @@ public class LadokResultService {
         if (grade == null || grade.isBlank())
             throw new IllegalArgumentException("grade is required");
 
-        // Build the result entity and persist it via the DAO. The DAO handles
-        // underlying persistence concerns (JPA/entity manager), so the service
-        // remains focused on business logic and validation.
+        // Build the result entity and persist it via the DAO
         LadokResultEntity result = new LadokResultEntity(personalNo, courseId, moduleCode, examDate, grade);
         resultDAO.saveResult(result);
 
-        // Return the saved entity (may include generated ids or timestamps added by DAO)
+        // Return the saved entity
         return result;
     }
 }

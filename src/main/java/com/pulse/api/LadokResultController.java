@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller for handling Ladok result-related API requests.
+ */
 @Path("/ladok")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -24,11 +27,19 @@ public class LadokResultController {
 
     private final EntityManagerFactory emf;
 
+    /**
+     * Constructor initializing the EntityManagerFactory for Ladok persistence unit.
+     */
     public LadokResultController() {
         this.emf = EntityManagerFactoryProvider.getFactory("ladokPU");
     }
 
-    // Assignment spec: reg_Resultat
+    /**
+     * Registers a single student result in Ladok.
+     * @param req Ladok result Data Transfer Object containing result details
+     * @return Response with the created LadokResultEntity or error message
+     * @throws Exception if an error occurs during registration
+     */
     @POST
     @Path("/results")
     public Response registerResult(LadokResultDTO req) {
@@ -48,11 +59,13 @@ public class LadokResultController {
             return Response.status(Response.Status.CREATED).entity(saved).build();
 
         } catch (IllegalArgumentException e) {
+            // Validation failed, return failure response
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(Map.of("error", e.getMessage()))
                     .build();
 
         } catch (Exception e) {
+            // Unexpected error, return failure response
             return Response.serverError()
                     .entity(Map.of("error", "Internal server error"))
                     .build();
@@ -61,7 +74,12 @@ public class LadokResultController {
         }
     }
 
-    // Batch transfer endpoint
+    /**
+     * Transfers a list of student results to Ladok.
+     * @param requests List of Ladok result Data Transfer Objects to transfer to Ladok.
+     * @return Response containing a list of Ladok response Data Transfer Objects inticating success/failure for each student.
+     * @throws Exception if an error occurs during the transfer.
+     */
     @POST
     @Path("/transfer")
     public Response transferResults(List<LadokResultDTO> requests) {
@@ -74,7 +92,6 @@ public class LadokResultController {
 
             for (LadokResultDTO req : requests) {
                 try {
-                    // Service handles all validation
                     LadokResultEntity saved = service.registerResult(
                             req.personalNo(),
                             req.courseId(),
@@ -90,7 +107,7 @@ public class LadokResultController {
                     ));
 
                 } catch (IllegalArgumentException e) {
-                    // Service validation failed - return user-friendly message
+                    // Service validation failed return failure response
                     responses.add(new LadokResponseDTO(
                             req.personalNo(),
                             "FAILED",
@@ -98,7 +115,7 @@ public class LadokResultController {
                     ));
 
                 } catch (Exception e) {
-                    // Unexpected error (database, etc.)
+                    // Unexpected error, return failure response
                     responses.add(new LadokResponseDTO(
                             req.personalNo(),
                             "FAILED",
@@ -106,7 +123,6 @@ public class LadokResultController {
                     ));
                 }
             }
-
             return Response.ok(responses).build();
             
         } finally {

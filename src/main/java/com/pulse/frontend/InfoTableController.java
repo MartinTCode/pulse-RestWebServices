@@ -19,6 +19,9 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Controller class for managing the Info Table User Interface
+ */
 public class InfoTableController {
 
     @FXML private TableView<StudentRow> infoTableView;
@@ -47,6 +50,11 @@ public class InfoTableController {
 
     private final ObservableList<StudentRow> data = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller class. 
+     * This method is automatically called after the FXML file has been loaded.
+     * It sets up the table columns, combo boxes, buttons, and their event handlers.
+     */
     @FXML
     public void initialize() {
 
@@ -69,7 +77,6 @@ public class InfoTableController {
         rutColumn.setEditable(true);
 
         // Textcolumns
-        
         setupEditableTextColumn(omdomeColumn, StudentRow::omdomeProperty, StudentRow::setOmdome);
         setupEditableTextColumn(betygColumn, StudentRow::betygProperty, StudentRow::setBetyg);
 
@@ -140,10 +147,12 @@ public class InfoTableController {
         antalMarkeradeLabel.setText("Antal markerade: " + count);
     }
 
-    //-------------------------
-    // Helper methods which setup editable text columns
-    //-------------------------
-
+    /**
+     * Sets up an editable text column in the table.
+     * @param col The TableColumn to set up
+     * @param prop A callback to get the StringProperty from the StudentRow
+     * @param setter A BiConsumer to set the new value in the StudentRow
+     */
     private void setupEditableTextColumn(
             TableColumn<StudentRow, String> col,
             javafx.util.Callback<StudentRow, javafx.beans.property.StringProperty> prop,
@@ -155,6 +164,11 @@ public class InfoTableController {
         col.setEditable(true);
     }
 
+    /**
+     * Custom TableCell implementation that uses a DatePicker for editing LocalDate values.
+     * @param <S> The type of the TableView generic type
+     * @param <T> The type of the item contained within the Cell
+     */
     private static class DatePickerTableCell<S> extends TableCell<S, LocalDate> {
         private final DatePicker datePicker = new DatePicker();
 
@@ -164,6 +178,9 @@ public class InfoTableController {
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }
 
+        /**
+         * Starts editing the cell by showing the DatePicker.
+         */
         @Override
         public void startEdit() {
             super.startEdit();
@@ -172,6 +189,9 @@ public class InfoTableController {
             datePicker.show();
         }
 
+        /**
+         * Cancels editing and reverts to displaying the text.
+         */
         @Override
         public void cancelEdit() {
             super.cancelEdit();
@@ -179,6 +199,10 @@ public class InfoTableController {
             setContentDisplay(ContentDisplay.TEXT_ONLY);
         }
 
+        /**
+         * Commits the edit with the new LocalDate value.
+         * @param newValue The new LocalDate value to commit
+         */
         @Override
         public void commitEdit(LocalDate newValue) {
             super.commitEdit(newValue);
@@ -190,6 +214,11 @@ public class InfoTableController {
             setContentDisplay(ContentDisplay.TEXT_ONLY);
         }
 
+        /**
+         * Updates the item in the cell, displaying either the DatePicker or the text.
+         * @param item The LocalDate item
+         * @param empty Whether the cell is empty
+         */
         @Override
         protected void updateItem(LocalDate item, boolean empty) {
             super.updateItem(item, empty);
@@ -211,6 +240,11 @@ public class InfoTableController {
         }
     }
 
+    /**
+     * Transfers the selected student results to Ladok via the Ladok API.
+     * Validates the selected rows and sends the data in a background thread.
+     * Updates the UI with the results of the transfer.
+     */
     private void overforMarkerade() {
         // Get selected rows
         var selectedRows = data.stream().filter(StudentRow::isSelected).toList();
@@ -308,6 +342,11 @@ public class InfoTableController {
         }).start();
     }
 
+    /**
+     * Shows an alert dialog with the given title and message.
+     * @param title The title of the alert dialog
+     * @param msg The message content of the alert dialog
+     */
     private void showAlert(String title, String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
             a.setTitle(title);
@@ -316,7 +355,10 @@ public class InfoTableController {
             a.showAndWait();
     }
 
-
+    /**
+     * Loads assignments for the selected course from the Canvas mock data.
+     * Populates the assignment ComboBox and clears dependent selections.
+     */
     private void loadAssignments() {
         String courseId = kurskodBox.getValue();
         if (courseId == null) return;
@@ -333,6 +375,10 @@ public class InfoTableController {
 
     }
 
+    /**
+     * Loads modules for the selected course from the Epok API.
+     * Populates the module ComboBox and clears dependent selections.
+     */
     private void loadModules() {
         String courseId = kurskodBox.getValue();
         if (courseId == null) return;
@@ -358,6 +404,10 @@ public class InfoTableController {
             }).start();
         }
 
+    /**
+     * Loads student results for the selected course and assignment from the Canvas mock data.
+     * Populates the table with student rows including personal numbers fetched from StudentITS.
+     */
     private void loadStudents() {
         String courseId = kurskodBox.getValue();
         String assignment = uppgiftBox.getValue();
