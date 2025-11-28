@@ -1,4 +1,4 @@
-# Pulse EduDataIntegrator
+# EduDataIntegrator
 
 A local JavaFX and REST-based prototype that demonstrates an integrated system for managing study results across multiple data sources using a Service-Oriented Architecture (SOA) approach.
 
@@ -67,15 +67,7 @@ Maven manages dependencies across three main layers: the UI (JavaFX), the databa
 - **Flyway Maven Plugin** – Applies migrations via the `db` profile.
 
 ## Technical Terms Explained
-text here
-
-
-old text here:
----
-
-## Technical Terms Explained
-
-This section clarifies the main technical keywords used in the project description and dependency overview.
+This section clarifies the main technical keywords used in the project description.
 
 - **Enterprise Architecture (EA)**  
   A structured way to describe how business processes, information, applications, and technology work together across an organization.
@@ -97,7 +89,7 @@ This section clarifies the main technical keywords used in the project descripti
 
 - **Database Migrations**  
   In practice, a *database migration* means applying controlled changes to the database automatically — such as creating tables, adding columns, or inserting initial data — through versioned SQL files.  
-  Each migration file has a name like `V1__create_tables.sql` or `V2__add_column.sql`, and Flyway runs them in order when the project starts or when you execute `mvn -Pdb flyway:migrate`.  
+  Each migration file has a name like `V1__create_tables.sql` or `V2__add_column.sql`, and Flyway runs them in order when the project starts or when you execute `mvn -P db flyway:migrate`.  
   This makes sure all three schemas (Epok, StudentITS, Ladok) always use the same, up-to-date structure without having to run SQL manually.
 
 - **Validation**  
