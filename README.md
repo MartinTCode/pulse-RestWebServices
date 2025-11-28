@@ -5,6 +5,42 @@ A local JavaFX and REST-based prototype that demonstrates an integrated system f
 ---
 
 ## Overview
+EduDataIntegrator is a prototype that pulls student grades from (mocked) Canvas assignments, integrates them with student data from StudentITS, and sends them to Ladok for official record-keeping. It demonstrates how three separate education systems (mocked locally) can be connected through REST APIs and a shared database layer.
+
+Built with JavaFX for the UI and PostgreSQL for data, it's a hands-on example of Service-Oriented Architecture applied to university data management.
+
+## Hard Depenencies
+These need to be installed manually before you can run the project. Maven handles everything else.
+
+- **Java 21** – Required to compile and run the code.
+- **PostgreSQL** – The project uses three local database schemas (Epok, StudentITS, Ladok). 
+- **Maven 3.9.6+** – Build tool for compiling and running tests and to handle *soft dependencies* automatically. 
+
+### Database setup
+Create a PostgreSQL user with the credentials in [`src/main/resources/db.properties`](src/main/resources/db.properties) (or adjust the properties file to match your local setup). The migration scripts will create the three schemas automatically when you run the project.
+
+## How to run
+- 1: Build the project with maven: 
+`mvn clean install`
+- 2: Make sure PostgreSQL is running locally as per db.properties (see above, *Database setup*).
+- 3: Run migrations (set's up tables, schemas and populates with test data automatically):
+`mvn -P db flyway:migrate`
+- 4: Start the REST server (in one terminal): 
+`mvn clean compile exec:java`
+- 5: Start the JavaFX application (in another terminal):
+`mvn javafx:run`
+- 6: Run the program through the frontend JavaFX interface.
+
+---
+
+## Maven Core Dependencies and Plugins:
+text here
+
+## Technical Terms Explained
+text here
+
+---
+OLD TEXT FROM README:
 
 - Uses **PostgreSQL** for databases (three schemas: Epok, StudentITS, Ladok)  
 - Uses **JavaFX** for the frontend (with optional CSS styling)  
