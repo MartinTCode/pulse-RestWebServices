@@ -271,6 +271,15 @@ public class InfoTableController {
             return;
         }
 
+        boolean hasRowWithRegisteredGrade = selectedRows.stream()
+            .anyMatch(row -> row.getStatus().equals("SUCCESS"));
+
+        if (hasRowWithRegisteredGrade) {
+            showAlert("Redan överförda betyg", 
+                "En eller flera markerade rader har redan ett registrerat betyg i Ladok.");
+            return;
+        }
+
         // Split module code if needed
         String moduleCode = modulBox.getValue().split(" ")[0];
         String courseId = kurskodBox.getValue();
