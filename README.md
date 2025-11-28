@@ -17,7 +17,9 @@ These need to be installed manually before you can run the project. Maven handle
 - **Maven 3.9.6+** – Build tool for compiling and running tests and to handle *soft dependencies* automatically. 
 
 ### Database setup
-Create a PostgreSQL user with the credentials in [`src/main/resources/db.properties`](src/main/resources/db.properties) (or adjust the properties file to match your local setup). The migration scripts will create the three schemas automatically when you run the project.
+Create a PostgreSQL user with the credentials in [`src/main/resources/db.properties`](src/main/resources/db.properties) (or adjust the properties file to match your local setup). Create a database named pulse with the database owner being user pulse.
+
+The migration scripts will create the three schemas automatically when you run the project.
 
 ## How to run
 - 1: Build the project with maven: 
