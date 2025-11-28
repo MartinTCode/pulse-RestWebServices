@@ -33,8 +33,38 @@ Create a PostgreSQL user with the credentials in [`src/main/resources/db.propert
 
 ---
 
-## Maven Core Dependencies and Plugins:
-text here
+## Maven Core Dependencies and Plugins
+
+Maven manages dependencies across three main layers: the UI (JavaFX), the database (Hibernate + PostgreSQL), and REST integration (Jersey). Here are the core ones:
+
+### Frontend
+- **JavaFX** – Builds the desktop GUI.
+
+### Database & Persistence
+- **PostgreSQL** – JDBC driver for the local postgreSQL database.
+- **HikariCP** – Reuses database connections instead of opening new ones for each query (faster). (See [`ConnectionFactory.java`](src/main/java/com/pulse/config/ConnectionFactory.java) for how it's configured.)
+- **Jakarta Persistence API (JPA)** – Standard way to map Java objects to database tables via Entity files. (See entity classes like [`StudentitsStudentAccountEntity.java`](src/main/java/com/pulse/entity/StudentitsStudentAccountEntity.java) and [`persistence.xml`](src/main/resources/META-INF/persistence.xml) for configuration.)
+- **Hibernate** – Implements JPA; generates SQL automatically from entity annotations.
+- **Flyway** – Automatically ensures everyone has the same database state across the three schemas (no manual SQL needed).
+
+### REST & Integration
+- **Jersey** – REST framework for HTTP endpoints.Automates java methods into HTTP endpoints via URL mapping.
+- **Jackson** – Automatically converts Java objects to JSON when sending REST responses and JSON to Java objects when receiving requests. (See [`ObjectMapperContextResolver.java`](src/main/java/com/pulse/config/ObjectMapperContextResolver.java) for configuration.)
+
+### Validation & Logging
+- **SLF4J + Logback** – Logging framework for debugging.
+
+### Testing
+- **JUnit 5** – Unit testing.
+- **TestFX** – JavaFX GUI testing.(not used in this project)
+- **Rest-Assured** – REST endpoint testing. (not used in this project)
+
+### Build Plugins
+- **Maven Compiler Plugin** – Compiles to Java 21.
+- **Maven Surefire / Failsafe** – Run tests.
+- **Maven Enforcer Plugin** – Ensures correct Java/Maven versions.
+- **JavaFX Maven Plugin** – Runs GUI with `mvn javafx:run`.
+- **Flyway Maven Plugin** – Applies migrations via the `db` profile.
 
 ## Technical Terms Explained
 text here
